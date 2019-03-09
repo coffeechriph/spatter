@@ -1,0 +1,72 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+    id 'application'
+}
+
+group 'rain.editor'
+version '1.0'
+mainClassName = "spatter.EntryKt"
+
+ext {
+    gdxVersion = '1.9.9'
+    jomlVersion = "1.9.12"
+    lwjglVersion = "3.2.2-SNAPSHOT"
+}
+
+def os = System.getProperty("os.name").replace(' ', '').toLowerCase()
+println "Building on $os.."
+
+if (os.contains("windows")) {
+    project.ext.lwjglNatives = "natives-windows"
+}
+else if (os.contains("macos")) {
+    applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
+    project.ext.lwjglNatives = "natives-macos"
+}
+else {
+    throw new RuntimeException("Operating system not supported!")
+}
+
+
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    flatDir {
+        dirs '../rain/build/libs'
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile name: 'rain-1.0'
+    runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-vma:$lwjglVersion:$lwjglNatives"
+
+    // TODO: I would like to remove the gdx dependency
+    compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+
+    if (os.contains("macosx")) {
+        runtimeOnly "org.lwjgl:lwjgl-vulkan:$lwjglVersion:$lwjglNatives"
+    }
+}
+
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.noReflect = true
+    kotlinOptions.noStdlib = true
+    kotlinOptions.freeCompilerArgs = ['-Xno-param-assertions']
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src"
+}
