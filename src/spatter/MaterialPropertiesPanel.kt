@@ -61,6 +61,11 @@ class MaterialPropertiesPanel(window: Window) {
                 3 -> textureLabel.string = fileChooseDialog.lastSelectedItem!!.string
             }
         }
+
+        if (doneButton.clicked) {
+            // TODO: Verify that we have atleast vertex & fragment shader
+            panel.visible = false
+        }
     }
 
     fun show() {
