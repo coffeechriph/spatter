@@ -4,12 +4,43 @@ import rain.api.Window
 import rain.api.gui.v2.*
 
 class TilemapPropertiesPanel(private val window: Window) {
+    var numTileX = 0
+        get() {
+            field = widthTextField.string.toInt()
+            return field
+        }
+        private set
+    var numTileY = 0
+        get() {
+            field = heightTextField.string.toInt()
+            return field
+        }
+        private set
+    var tileW = 0
+        get(){
+            field = tileWidthTextField.string.toInt()
+            return field
+        }
+        private set
+    var tileH = 0
+        get(){
+            field = tileHeightTextField.string.toInt()
+            return field
+        }
+        private set
+
     private var layout: FillRowLayout = FillRowLayout()
     private var panel: Panel
     private var widthLabel: Label
     private var heightLabel: Label
     private var widthTextField: TextField
     private var heightTextField: TextField
+
+
+    private var tileWidthLabel: Label
+    private var tileHeightLabel: Label
+    private var tileWidthTextField: TextField
+    private var tileHeightTextField: TextField
     private val doneButton: Button
 
     var created = false
@@ -27,9 +58,13 @@ class TilemapPropertiesPanel(private val window: Window) {
 
         widthLabel = panel.createLabel("Width")
         widthTextField = panel.createTextField("100")
-
         heightLabel = panel.createLabel("Height")
         heightTextField = panel.createTextField("100")
+
+        tileWidthLabel = panel.createLabel("Tile Width")
+        tileWidthTextField = panel.createTextField("32")
+        tileHeightLabel = panel.createLabel("Tile Height")
+        tileHeightTextField = panel.createTextField("32")
 
         doneButton = panel.createButton("Done")
     }
