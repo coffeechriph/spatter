@@ -17,34 +17,16 @@ class EditorState(private val window: Window, stateManager: StateManager): State
     private lateinit var resourcePanel: ResourcePanel
     private lateinit var materialPropertiesPanel: MaterialPropertiesPanel
     private lateinit var tilemapPropertiesPanel: TilemapPropertiesPanel
+    private lateinit var tilemapEditor: TilemapEditor
 
-    private val tilemaps = ArrayList<Tilemap>()
-
-    // TODO: Replace these with dynamic materials
-    private lateinit var tilemapTexture: Texture2d
-    private lateinit var tilemapMaterial: Material
-    override fun init(resourceFactory: ResourceFactory, scene: Scene, input: Input) {
+    override fun init(resourceFactory: ResourceFactory, scene: Scene) {
         setupEditorStyle()
 
         tilemapPropertiesPanel = TilemapPropertiesPanel(window)
         materialPropertiesPanel = MaterialPropertiesPanel(window)
         toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel)
+        tilemapEditor = TilemapEditor(resourceFactory, scene)
         resourcePanel = ResourcePanel(window)
-
-        tilemapTexture = resourceFactory.buildTexture2d()
-            .withName("tilemapTexture")
-            .fromImageFile("./data/textures/tiles.png")
-            .withFilter(TextureFilter.NEAREST)
-            .build()
-
-        tilemapTexture.setTiledTexture(16,16)
-        tilemapMaterial = resourceFactory.buildMaterial()
-            .withName("tilemapMaterial")
-            .withVertexShader("./data/shaders/tilemap.vert.spv")
-            .withFragmentShader("./data/shaders/tilemap.frag.spv")
-            .withTexture(tilemapTexture)
-            .withBlendEnabled(false)
-            .build()
     }
 
     override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input, deltaTime: Float) {
@@ -52,24 +34,14 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         toolsPanel.update()
         resourcePanel.update()
         materialPropertiesPanel.update()
+        tilemapEditor.update(input)
 
         if (tilemapPropertiesPanel.created) {
-            val defaultTileGfx = Array(tilemapPropertiesPanel.numTileX * tilemapPropertiesPanel.numTileY) {
-                TileGfx(0, 0)
-            }
-            val tilemap = Tilemap()
-            tilemap.create (
-                resourceFactory,
-                tilemapMaterial,
+            tilemapEditor.createTilemap(
                 tilemapPropertiesPanel.numTileX,
                 tilemapPropertiesPanel.numTileY,
                 tilemapPropertiesPanel.tileW.toFloat(),
-                tilemapPropertiesPanel.tileH.toFloat(),
-                defaultTileGfx
-            )
-            tilemap.update(defaultTileGfx)
-            tilemap.transform.setPosition(100.0f, 24.0f, 1.0f)
-            scene.addTilemap(tilemap)
+                tilemapPropertiesPanel.tileH.toFloat())
         }
     }
 
