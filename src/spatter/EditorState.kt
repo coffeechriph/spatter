@@ -29,7 +29,7 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         resourcePanel = ResourcePanel(window)
     }
 
-    override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input, deltaTime: Float) {
+    override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input) {
         tilemapPropertiesPanel.update()
         toolsPanel.update()
         resourcePanel.update()
