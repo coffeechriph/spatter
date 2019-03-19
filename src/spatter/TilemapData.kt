@@ -17,6 +17,8 @@ data class TileGroup @JsonCreator constructor(
 data class TilemapLayer @JsonCreator constructor(
     @JsonProperty("tile_group")
     var tileGroup: MutableList<TileGroup>,
+    @JsonProperty("metadata")
+    var metadata: MutableList<Metadata>,
     @JsonIgnore
     var tileGfx: Array<TileGfx>,
     @JsonIgnore

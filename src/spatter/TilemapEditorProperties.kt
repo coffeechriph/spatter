@@ -15,16 +15,26 @@ class TilemapEditorProperties(private val window: Window) {
     private var tileLayerLayout = FillRowLayout()
     private var tileSelectorPanel: Panel
     private var tileLayerPanel: Panel
+    private var metadataPanel: Panel
+
     private var createTileLayerLabel: Label
     private var createTileLayerButton: Button
+
+    private var metadataLayout = FillRowLayout()
+    private var newMetadataEntryLabel: Label
+    private var newMetadataEntryButton: Button
+
     private var selectedTilemapData: TilemapData? = null
     private var currentActiveLayers = ArrayList<ToggleButton>()
+
+    private var currentActiveMetadata = ArrayList<TextField>()
 
     var visible = false
         set(value) {
             field = value
             tileSelectorPanel.visible = value
             tileLayerPanel.visible = value
+            metadataPanel.visible = value
         }
         get() {
             return tileSelectorPanel.visible
@@ -54,14 +64,28 @@ class TilemapEditorProperties(private val window: Window) {
 
         createTileLayerLabel = tileLayerPanel.createLabel("Layers")
         createTileLayerButton = tileLayerPanel.createButton("+")
+
+        metadataLayout.componentsPerRow = 2
+        metadataLayout.componentHeight = 24.0f
+        metadataPanel = guiManagerCreatePanel(metadataLayout)
+        metadataPanel.w = 200.0f
+        metadataPanel.h = 400.0f
+        metadataPanel.skin = editorSkin
+        newMetadataEntryLabel = metadataPanel.createLabel("New Metadata")
+        newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
     fun update(selectedTilemapData: TilemapData?, tileMaterial: Material, scene: Scene, resourceFactory: ResourceFactory) {
         tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
         tileSelectorPanel.y = tileLayerPanel.y
 
+        metadataPanel.x = tileLayerPanel.x - metadataPanel.w
+        metadataPanel.y = tileLayerPanel.y
+
         if (selectedTilemapData != null) {
             populateActiveLayerButtons(selectedTilemapData)
+            populateMetadataButtons(selectedTilemapData)
+            this.selectedTilemapData = selectedTilemapData
 
             // Change active layer
             for (i in 0 until currentActiveLayers.size) {
@@ -109,11 +133,45 @@ class TilemapEditorProperties(private val window: Window) {
                 tilemap.transform.x = selectedTilemapData.activeLayer.tilemapRef.transform.x
                 tilemap.transform.y = selectedTilemapData.activeLayer.tilemapRef.transform.y
                 tilemap.transform.z = selectedTilemapData.activeLayer.tilemapRef.transform.z + 1.0f
-                val newLayer = TilemapLayer(mutableListOf(), tileGfx, tilemap)
+
+                val defaultIndexSet = HashSet<Int>()
+                for (i in 0 until selectedTilemapData.tileNumX*selectedTilemapData.tileNumX) {
+                    defaultIndexSet.add(i)
+                }
+                val defaultGroup = TileGroup(0, 0, defaultIndexSet)
+                val newLayer = TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), tileGfx, tilemap)
                 selectedTilemapData.layers.add(newLayer)
 
                 val button = tileLayerPanel.createToggleButton("Layer:${currentActiveLayers.size}")
                 currentActiveLayers.add(button)
+            }
+
+            if (newMetadataEntryButton.clicked) {
+                val metadata = Metadata("name", "value")
+                selectedTilemapData.activeLayer.metadata.add(metadata)
+
+                val nameField = metadataPanel.createTextField(metadata.name)
+                val valueField = metadataPanel.createTextField(metadata.value)
+                currentActiveMetadata.add(nameField)
+                currentActiveMetadata.add(valueField)
+            }
+
+            var index = 0
+            for (metadataField in currentActiveMetadata) {
+                if (metadataField.textEdited) {
+
+                    // Name fields end up at even indices
+                    if (index % 2 == 0) {
+                        selectedTilemapData.activeLayer.metadata[index/2].name = metadataField.string
+                    }
+                    else {
+                        selectedTilemapData.activeLayer.metadata[index/2].value = metadataField.string
+                    }
+
+                    break
+                }
+
+                index += 1
             }
         }
 
@@ -122,6 +180,22 @@ class TilemapEditorProperties(private val window: Window) {
         for(image in images) {
             if (image.clicked) {
                 selectedTileIndex = Vector2i(image.imageTileIndexX, image.imageTileIndexY)
+            }
+        }
+    }
+
+    private fun populateMetadataButtons(selectedTilemapData: TilemapData) {
+        if (this.selectedTilemapData != selectedTilemapData) {
+            for (button in currentActiveMetadata) {
+                tileLayerPanel.removeComponent(button)
+            }
+            currentActiveMetadata.clear()
+
+            for (data in selectedTilemapData.activeLayer.metadata) {
+                val nameField = metadataPanel.createTextField(data.name)
+                val valueField = metadataPanel.createTextField(data.value)
+                currentActiveMetadata.add(nameField)
+                currentActiveMetadata.add(valueField)
             }
         }
     }
@@ -167,8 +241,11 @@ class TilemapEditorProperties(private val window: Window) {
             tileLayerPanel.y = window.size.y - tileLayerPanel.h - tileSelectorPanel.h
             tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
             tileSelectorPanel.y = tileLayerPanel.y
+            metadataPanel.x = tileLayerPanel.x - metadataPanel.w
+            metadataPanel.y = tileLayerPanel.y
         }
         tileSelectorPanel.visible = true
         tileLayerPanel.visible = true
+        metadataPanel.visible = true
     }
 }

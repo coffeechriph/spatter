@@ -79,10 +79,10 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             defaultIndexSet.add(i)
         }
         val defaultGroup = TileGroup(0, 0, defaultIndexSet)
-        val defaultLayer = TilemapLayer(mutableListOf(defaultGroup), defaultTileGfx, tilemap)
+        val defaultLayer = TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), defaultTileGfx, tilemap)
         val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList(), defaultLayer)
         tilemapData.layers.add(defaultLayer)
-        currentProjectScene.tilemapData.add(tilemapData)
+        currentProjectScene.mapData.add(tilemapData)
     }
 
     fun update(input: Input) {
@@ -184,7 +184,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     }
 
     private fun selectTilemap(x: Int, y: Int) {
-        for (tilemapData in currentProjectScene.tilemapData) {
+        for (tilemapData in currentProjectScene.mapData) {
             val tilemap = tilemapData.activeLayer.tilemapRef
             if (x >= tilemap.transform.x && x <= tilemap.transform.x + tilemap.tileNumX * tilemap.tileWidth &&
                 y >= tilemap.transform.y && y <= tilemap.transform.y + tilemap.tileNumY * tilemap.tileHeight) {
