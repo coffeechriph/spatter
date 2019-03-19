@@ -11,8 +11,6 @@ import rain.api.scene.Scene
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
 import java.util.*
-import java.util.stream.Collectors
-import java.util.stream.IntStream
 import kotlin.collections.HashSet
 
 class TilemapEditor(private val resourceFactory: ResourceFactory, private val scene: Scene) {
@@ -27,7 +25,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     private var movePosition = false
     private var moveDiffStart = Vector2f(0.0f, 0.0f)
 
-    private var tileSelector: TileSelector
+    private var tilemapEditorProperties: TilemapEditorProperties
 
     init {
         tilemapTexture = resourceFactory.buildTexture2d()
@@ -54,7 +52,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             .build()
         guiManagerSetMaterial(guiMaterial)
 
-        tileSelector = TileSelector(scene.window)
+        tilemapEditorProperties = TilemapEditorProperties(scene.window)
     }
 
     fun createTilemap(numTileX: Int, numTileY: Int, tileW: Float, tileH: Float) {
@@ -88,17 +86,17 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     }
 
     fun update(input: Input) {
-        tileSelector.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
+        tilemapEditorProperties.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
 
         if (input.keyState(Input.Key.KEY_1) == Input.InputState.PRESSED) {
             editMode = EditMode.MOVE
-            tileSelector.visible = false
+            tilemapEditorProperties.visible = false
         }
         else if (input.keyState(Input.Key.KEY_2) == Input.InputState.PRESSED) {
             editMode = EditMode.EDIT
 
-            if (!tileSelector.visible) {
-                tileSelector.show(tilemapTexture)
+            if (!tilemapEditorProperties.visible) {
+                tilemapEditorProperties.show(tilemapTexture)
             }
         }
 
@@ -151,8 +149,8 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
 
             if (tx >= 0 && tx < activeTilemapLayer.tileNumX &&
                 ty >= 0 && ty < activeTilemapLayer.tileNumY) {
-                val imageX = tileSelector.selectedTileIndex.x
-                val imageY = tileSelector.selectedTileIndex.y
+                val imageX = tilemapEditorProperties.selectedTileIndex.x
+                val imageY = tilemapEditorProperties.selectedTileIndex.y
                 val tileIndex = tx + ty * activeTilemapLayer.tileNumX
                 val activeLayer = selectedTilemapData!!.activeLayer
 

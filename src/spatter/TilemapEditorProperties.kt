@@ -10,7 +10,7 @@ import rain.api.scene.Scene
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
 
-class TileSelector(private val window: Window) {
+class TilemapEditorProperties(private val window: Window) {
     private var layout: GridLayout = GridLayout()
     private var tileLayerLayout = FillRowLayout()
     private var tileSelectorPanel: Panel
@@ -163,8 +163,8 @@ class TileSelector(private val window: Window) {
                 }
             }
 
-            tileLayerPanel.x = window.size.x - tileLayerPanel.w
-            tileLayerPanel.y = window.size.y - tileLayerPanel.h
+            tileLayerPanel.x = window.size.x - tileLayerPanel.w - tileSelectorPanel.w
+            tileLayerPanel.y = window.size.y - tileLayerPanel.h - tileSelectorPanel.h
             tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
             tileSelectorPanel.y = tileLayerPanel.y
         }
