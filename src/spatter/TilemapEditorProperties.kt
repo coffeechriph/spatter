@@ -84,7 +84,6 @@ class TilemapEditorProperties(private val window: Window) {
 
         if (selectedTilemapData != null) {
             populateActiveLayerButtons(selectedTilemapData)
-            populateMetadataButtons(selectedTilemapData)
             this.selectedTilemapData = selectedTilemapData
 
             // Change active layer
@@ -105,6 +104,7 @@ class TilemapEditorProperties(private val window: Window) {
                     selectedTilemapData.activeLayer.tilemapRef.update(selectedTilemapData.activeLayer.tileGfx)
 
                     selectedTilemapData.activeLayer = selectedTilemapData.layers[i]
+                    populateMetadataButtons(selectedTilemapData)
 
                     // Remove potential tint from active
                     for (tile in selectedTilemapData.activeLayer.tileGfx) {
@@ -184,22 +184,6 @@ class TilemapEditorProperties(private val window: Window) {
         }
     }
 
-    private fun populateMetadataButtons(selectedTilemapData: TilemapData) {
-        if (this.selectedTilemapData != selectedTilemapData) {
-            for (button in currentActiveMetadata) {
-                tileLayerPanel.removeComponent(button)
-            }
-            currentActiveMetadata.clear()
-
-            for (data in selectedTilemapData.activeLayer.metadata) {
-                val nameField = metadataPanel.createTextField(data.name)
-                val valueField = metadataPanel.createTextField(data.value)
-                currentActiveMetadata.add(nameField)
-                currentActiveMetadata.add(valueField)
-            }
-        }
-    }
-
     private fun populateActiveLayerButtons(selectedTilemapData: TilemapData) {
         if (this.selectedTilemapData != selectedTilemapData) {
             for (button in currentActiveLayers) {
@@ -210,8 +194,28 @@ class TilemapEditorProperties(private val window: Window) {
 
             for (i in 0 until selectedTilemapData.layers.size) {
                 val button = tileLayerPanel.createToggleButton("Layer:$i")
+
+                if (selectedTilemapData.layers.indexOf(selectedTilemapData.activeLayer) == i) {
+                    button.checked = true
+                }
+
                 currentActiveLayers.add(button)
             }
+            populateMetadataButtons(selectedTilemapData)
+        }
+    }
+
+    private fun populateMetadataButtons(selectedTilemapData: TilemapData) {
+        for (button in currentActiveMetadata) {
+            metadataPanel.removeComponent(button)
+        }
+        currentActiveMetadata.clear()
+
+        for (data in selectedTilemapData.activeLayer.metadata) {
+            val nameField = metadataPanel.createTextField(data.name)
+            val valueField = metadataPanel.createTextField(data.value)
+            currentActiveMetadata.add(nameField)
+            currentActiveMetadata.add(valueField)
         }
     }
 
