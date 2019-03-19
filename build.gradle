@@ -49,7 +49,8 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8"
+    
     if (os.contains("macosx")) {
         runtimeOnly "org.lwjgl:lwjgl-vulkan:$lwjglVersion:$lwjglNatives"
     }

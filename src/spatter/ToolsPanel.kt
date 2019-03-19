@@ -2,6 +2,10 @@ package spatter
 
 import rain.api.Window
 import rain.api.gui.v2.*
+import rain.api.scene.TileGfx
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 class ToolsPanel(private val window: Window,
                  private val materialProperties: MaterialPropertiesPanel,
@@ -11,6 +15,7 @@ class ToolsPanel(private val window: Window,
     private val createMaterialButton: Button
     private val createTilemapButton: Button
     private val createEntityButton: Button
+    private val saveSceneButton: Button
 
     init {
         panelLayout = GridLayout()
@@ -29,6 +34,7 @@ class ToolsPanel(private val window: Window,
         createMaterialButton = panel.createButton("New Material")
         createTilemapButton = panel.createButton("New Tilemap")
         createEntityButton = panel.createButton("New Entity")
+        saveSceneButton = panel.createButton("Save Scene")
     }
 
     fun update() {
@@ -40,6 +46,18 @@ class ToolsPanel(private val window: Window,
 
         if (createMaterialButton.clicked) {
             materialProperties.show()
+        }
+
+        if (saveSceneButton.clicked) {
+            val json = jsonSceneWriter.writeValueAsString(currentProjectScene)
+
+            // TODO: We want to specify actual project directories
+            if (!File("projects").exists()) {
+                File("projects").mkdir()
+                File("projects/project1").mkdir()
+                File("projects/project1/scenes").mkdir()
+            }
+            File("projects/project1/scenes/scene.json").writeText(json)
         }
     }
 }
