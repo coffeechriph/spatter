@@ -8,6 +8,7 @@ import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
 import rain.api.scene.Scene
 import rain.api.scene.TileGfx
+import rain.api.scene.TileGfxNone
 import rain.api.scene.Tilemap
 import spatter.Metadata
 import spatter.editorSkin
@@ -120,7 +121,7 @@ class TilemapEditorProperties(private val window: Window) {
             }
 
             if (createTileLayerButton.clicked) {
-                val tileGfx = Array(selectedTilemapData.tileNumX*selectedTilemapData.tileNumY){ TileGfx(0, 0) }
+                val tileGfx = Array(selectedTilemapData.tileNumX*selectedTilemapData.tileNumY){ TileGfxNone }
                 val tilemap = Tilemap()
                 tilemap.create(
                     resourceFactory,

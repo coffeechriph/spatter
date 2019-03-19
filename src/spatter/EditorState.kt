@@ -6,6 +6,7 @@ import rain.api.Input
 import rain.api.Window
 import rain.api.gfx.ResourceFactory
 import rain.api.scene.Scene
+import spatter.entity.NewEntityDialog
 import spatter.tilemap.TilemapEditor
 import spatter.tilemap.TilemapPropertiesPanel
 
@@ -15,13 +16,15 @@ class EditorState(private val window: Window, stateManager: StateManager): State
     private lateinit var materialPropertiesPanel: MaterialPropertiesPanel
     private lateinit var tilemapPropertiesPanel: TilemapPropertiesPanel
     private lateinit var tilemapEditor: TilemapEditor
+    private lateinit var newEntityDialog: NewEntityDialog
 
     override fun init(resourceFactory: ResourceFactory, scene: Scene) {
         setupEditorStyle()
 
         tilemapPropertiesPanel = TilemapPropertiesPanel(window)
         materialPropertiesPanel = MaterialPropertiesPanel(window)
-        toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel)
+        newEntityDialog = NewEntityDialog(window)
+        toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel, newEntityDialog)
         tilemapEditor = TilemapEditor(resourceFactory, scene)
         resourcePanel = ResourcePanel(window)
     }
@@ -32,6 +35,7 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         resourcePanel.update()
         materialPropertiesPanel.update()
         tilemapEditor.update(input)
+        newEntityDialog.update(currentProjectScene, resourcePanel)
 
         if (tilemapPropertiesPanel.created) {
             tilemapEditor.createTilemap(

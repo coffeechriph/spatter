@@ -2,12 +2,14 @@ package spatter
 
 import rain.api.Window
 import rain.api.gui.v2.*
+import spatter.entity.NewEntityDialog
 import spatter.tilemap.TilemapPropertiesPanel
 import java.io.File
 
 class ToolsPanel(private val window: Window,
                  private val materialProperties: MaterialPropertiesPanel,
-                 private val tilemapProperties: TilemapPropertiesPanel
+                 private val tilemapProperties: TilemapPropertiesPanel,
+                 private val newEntityDialog: NewEntityDialog
 ) {
     private val panelLayout: GridLayout
     private val panel: Panel
@@ -45,6 +47,10 @@ class ToolsPanel(private val window: Window,
 
         if (createMaterialButton.clicked) {
             materialProperties.show()
+        }
+
+        if (createEntityButton.clicked) {
+            newEntityDialog.show()
         }
 
         if (saveSceneButton.clicked) {
