@@ -1,4 +1,4 @@
-package spatter
+package spatter.tilemap
 
 import org.joml.Vector2f
 import rain.api.Input
@@ -10,6 +10,8 @@ import rain.api.gui.v2.guiManagerSetMaterial
 import rain.api.scene.Scene
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
+import spatter.EditMode
+import spatter.currentProjectScene
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -79,7 +81,8 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             defaultIndexSet.add(i)
         }
         val defaultGroup = TileGroup(0, 0, defaultIndexSet)
-        val defaultLayer = TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), defaultTileGfx, tilemap)
+        val defaultLayer =
+            TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), defaultTileGfx, tilemap)
         val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList(), defaultLayer)
         tilemapData.layers.add(defaultLayer)
         currentProjectScene.mapData.add(tilemapData)

@@ -4,13 +4,10 @@ import rain.State
 import rain.StateManager
 import rain.api.Input
 import rain.api.Window
-import rain.api.gfx.Material
 import rain.api.gfx.ResourceFactory
-import rain.api.gfx.Texture2d
-import rain.api.gfx.TextureFilter
 import rain.api.scene.Scene
-import rain.api.scene.TileGfx
-import rain.api.scene.Tilemap
+import spatter.tilemap.TilemapEditor
+import spatter.tilemap.TilemapPropertiesPanel
 
 class EditorState(private val window: Window, stateManager: StateManager): State(stateManager) {
     private lateinit var toolsPanel: ToolsPanel

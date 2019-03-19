@@ -1,4 +1,4 @@
-package spatter
+package spatter.tilemap
 
 import org.joml.Vector2i
 import rain.api.Window
@@ -9,6 +9,8 @@ import rain.api.gui.v2.*
 import rain.api.scene.Scene
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
+import spatter.Metadata
+import spatter.editorSkin
 
 class TilemapEditorProperties(private val window: Window) {
     private var layout: GridLayout = GridLayout()
@@ -139,7 +141,8 @@ class TilemapEditorProperties(private val window: Window) {
                     defaultIndexSet.add(i)
                 }
                 val defaultGroup = TileGroup(0, 0, defaultIndexSet)
-                val newLayer = TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), tileGfx, tilemap)
+                val newLayer =
+                    TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), tileGfx, tilemap)
                 selectedTilemapData.layers.add(newLayer)
 
                 val button = tileLayerPanel.createToggleButton("Layer:${currentActiveLayers.size}")

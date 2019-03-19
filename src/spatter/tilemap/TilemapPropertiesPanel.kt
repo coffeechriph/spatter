@@ -1,7 +1,8 @@
-package spatter
+package spatter.tilemap
 
 import rain.api.Window
 import rain.api.gui.v2.*
+import spatter.editorSkin
 
 class TilemapPropertiesPanel(private val window: Window) {
     var numTileX = 0

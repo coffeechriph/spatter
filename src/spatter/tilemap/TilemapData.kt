@@ -1,10 +1,11 @@
-package spatter
+package spatter.tilemap
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
+import spatter.Metadata
 
 data class TileGroup @JsonCreator constructor(
     @JsonProperty("image_x")

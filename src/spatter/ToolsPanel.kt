@@ -2,14 +2,13 @@ package spatter
 
 import rain.api.Window
 import rain.api.gui.v2.*
-import rain.api.scene.TileGfx
+import spatter.tilemap.TilemapPropertiesPanel
 import java.io.File
-import java.io.FileOutputStream
-import java.util.*
 
 class ToolsPanel(private val window: Window,
                  private val materialProperties: MaterialPropertiesPanel,
-                 private val tilemapProperties: TilemapPropertiesPanel) {
+                 private val tilemapProperties: TilemapPropertiesPanel
+) {
     private val panelLayout: GridLayout
     private val panel: Panel
     private val createMaterialButton: Button
