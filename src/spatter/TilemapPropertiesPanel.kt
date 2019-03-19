@@ -57,9 +57,9 @@ class TilemapPropertiesPanel(private val window: Window) {
         panel.visible = false
 
         widthLabel = panel.createLabel("Width")
-        widthTextField = panel.createTextField("100")
+        widthTextField = panel.createTextField("10")
         heightLabel = panel.createLabel("Height")
-        heightTextField = panel.createTextField("100")
+        heightTextField = panel.createTextField("10")
 
         tileWidthLabel = panel.createLabel("Tile Width")
         tileWidthTextField = panel.createTextField("32")

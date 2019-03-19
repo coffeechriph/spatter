@@ -22,7 +22,6 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     private val guiMaterial: Material
 
     var editMode: EditMode = EditMode.MOVE
-    private var selectedTilemap: Tilemap? = null
     private var selectedTilemapData: TilemapData? = null
     private var beginMovePosition = false
     private var movePosition = false
@@ -82,13 +81,14 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             defaultIndexSet.add(i)
         }
         val defaultGroup = TileGroup(0, 0, defaultIndexSet)
-        val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList(), defaultTileGfx, tilemap)
-        tilemapData.tileGroup.add(defaultGroup)
+        val defaultLayer = TilemapLayer(mutableListOf(defaultGroup), defaultTileGfx, tilemap)
+        val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList(), defaultLayer)
+        tilemapData.layers.add(defaultLayer)
         currentProjectScene.tilemapData.add(tilemapData)
     }
 
     fun update(input: Input) {
-        tileSelector.update()
+        tileSelector.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
 
         if (input.keyState(Input.Key.KEY_1) == Input.InputState.PRESSED) {
             editMode = EditMode.MOVE
@@ -105,7 +105,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
         if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
             if (editMode == EditMode.MOVE) {
                 selectTilemap(input.mousePosition.x, input.mousePosition.y)
-                if (selectedTilemap != null) {
+                if (selectedTilemapData != null) {
                     if (!movePosition && !beginMovePosition) {
                         beginMovePosition = true
                     }
@@ -117,8 +117,10 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
                 beginMovePosition = false
                 movePosition = true
 
-                moveDiffStart.x = input.mousePosition.x.toFloat() - selectedTilemap!!.transform.x
-                moveDiffStart.y = input.mousePosition.y.toFloat() - selectedTilemap!!.transform.y
+                for (layer in selectedTilemapData!!.layers) {
+                    moveDiffStart.x = input.mousePosition.x.toFloat() - layer.tilemapRef.transform.x
+                    moveDiffStart.y = input.mousePosition.y.toFloat() - layer.tilemapRef.transform.y
+                }
             }
         }
         else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.RELEASED) {
@@ -126,9 +128,11 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             movePosition = false
         }
 
-        if (movePosition && selectedTilemap != null) {
-            selectedTilemap!!.transform.x = input.mousePosition.x.toFloat() - moveDiffStart.x
-            selectedTilemap!!.transform.y = input.mousePosition.y.toFloat() - moveDiffStart.y
+        if (movePosition && selectedTilemapData != null) {
+            for (layer in selectedTilemapData!!.layers) {
+                layer.tilemapRef.transform.x = input.mousePosition.x.toFloat() - moveDiffStart.x
+                layer.tilemapRef.transform.y = input.mousePosition.y.toFloat() - moveDiffStart.y
+            }
         }
 
         if (editMode == EditMode.EDIT) {
@@ -140,51 +144,52 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     }
 
     private fun editTilemap(x: Int, y: Int) {
-        if (selectedTilemap != null) {
-            val tx = ((x - selectedTilemap!!.transform.x) / selectedTilemap!!.tileWidth).toInt()
-            val ty = ((y - selectedTilemap!!.transform.y) / selectedTilemap!!.tileHeight).toInt()
+        if (selectedTilemapData != null) {
+            val activeTilemapLayer = selectedTilemapData!!.activeLayer.tilemapRef
+            val tx = ((x - activeTilemapLayer.transform.x) / activeTilemapLayer.tileWidth).toInt()
+            val ty = ((y - activeTilemapLayer.transform.y) / activeTilemapLayer.tileHeight).toInt()
 
-            if (tx >= 0 && tx < selectedTilemap!!.tileNumX &&
-                ty >= 0 && ty < selectedTilemap!!.tileNumY) {
+            if (tx >= 0 && tx < activeTilemapLayer.tileNumX &&
+                ty >= 0 && ty < activeTilemapLayer.tileNumY) {
                 val imageX = tileSelector.selectedTileIndex.x
                 val imageY = tileSelector.selectedTileIndex.y
-                val tileIndex = tx + ty * selectedTilemap!!.tileNumX
+                val tileIndex = tx + ty * activeTilemapLayer.tileNumX
+                val activeLayer = selectedTilemapData!!.activeLayer
 
-                val oldGroup = findGroupMatchingIndex(selectedTilemapData!!, tileIndex)
+                val oldGroup = findGroupMatchingIndex(activeLayer, tileIndex)
                 oldGroup.ifPresent { group -> group.tileIndicesIntoMap.remove(tileIndex) }
 
-                val tileGroup = findGroupMatchingTile(selectedTilemapData!!, imageX, imageY)
-                tileGroup.ifPresentOrElse({group -> group.tileIndicesIntoMap.add(tileIndex)}, {createNewTileGroupWithTile(selectedTilemapData!!, imageX, imageY, tileIndex)})
+                val tileGroup = findGroupMatchingTile(activeLayer, imageX, imageY)
+                tileGroup.ifPresentOrElse({group -> group.tileIndicesIntoMap.add(tileIndex)}, {createNewTileGroupWithTile(activeLayer, imageX, imageY, tileIndex)})
 
-                selectedTilemapData!!.tileGfx[tileIndex] = TileGfx(imageX, imageY)
-                selectedTilemap!!.update(selectedTilemapData!!.tileGfx)
+                selectedTilemapData!!.activeLayer.tileGfx[tileIndex] = TileGfx(imageX, imageY)
+                activeTilemapLayer.update(selectedTilemapData!!.activeLayer.tileGfx)
             }
         }
     }
 
-    private fun findGroupMatchingIndex(tilemapData: TilemapData, tileIndex: Int): Optional<TileGroup> {
-        return tilemapData.tileGroup.stream()
+    private fun findGroupMatchingIndex(tilemapLayer: TilemapLayer, tileIndex: Int): Optional<TileGroup> {
+        return tilemapLayer.tileGroup.stream()
             .filter{a -> a.tileIndicesIntoMap.contains(tileIndex)}
             .findFirst()
     }
 
-    private fun findGroupMatchingTile(tilemap: TilemapData, imageX: Int, imageY: Int): Optional<TileGroup> {
-        return tilemap.tileGroup.stream()
+    private fun findGroupMatchingTile(tilemapLayer: TilemapLayer, imageX: Int, imageY: Int): Optional<TileGroup> {
+        return tilemapLayer.tileGroup.stream()
             .filter { a -> a.imageX == imageX && a.imageY == imageY }
             .findFirst()
     }
 
-    private fun createNewTileGroupWithTile(tilemapData: TilemapData, imageX: Int, imageY: Int, tileIndex: Int) {
+    private fun createNewTileGroupWithTile(tilemapLayer: TilemapLayer, imageX: Int, imageY: Int, tileIndex: Int) {
         val group = TileGroup(imageX, imageY, mutableSetOf(tileIndex))
-        tilemapData.tileGroup.add(group)
+        tilemapLayer.tileGroup.add(group)
     }
 
     private fun selectTilemap(x: Int, y: Int) {
         for (tilemapData in currentProjectScene.tilemapData) {
-            val tilemap = tilemapData.tilemapRef
+            val tilemap = tilemapData.activeLayer.tilemapRef
             if (x >= tilemap.transform.x && x <= tilemap.transform.x + tilemap.tileNumX * tilemap.tileWidth &&
                 y >= tilemap.transform.y && y <= tilemap.transform.y + tilemap.tileNumY * tilemap.tileHeight) {
-                selectedTilemap = tilemap
                 selectedTilemapData = tilemapData
                 break
             }
