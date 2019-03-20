@@ -2,7 +2,7 @@ package spatter.entity
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import spatter.Metadata
+import spatter.SceneMetadata
 
 data class ProjectEntityInstance @JsonCreator constructor(
     @JsonProperty("pos_x")
@@ -11,10 +11,15 @@ data class ProjectEntityInstance @JsonCreator constructor(
     var posY: Float,
     @JsonProperty("pos_z")
     var posZ: Float,
+    @JsonProperty("image_x")
+    var imageX: Int,
+    @JsonProperty("image_y")
+    var imageY: Int,
     var width: Float,
     var height: Float
 )
 
 data class ProjectEntity @JsonCreator constructor(
-    val metadata: MutableList<Metadata>,
+    var materialName: String,
+    val metadata: MutableList<SceneMetadata>,
     val instances: MutableList<ProjectEntityInstance>)

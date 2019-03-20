@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
-import spatter.Metadata
+import spatter.SceneMetadata
 
 data class TileGroup @JsonCreator constructor(
     @JsonProperty("image_x")
@@ -19,7 +19,7 @@ data class TilemapLayer @JsonCreator constructor(
     @JsonProperty("tile_group")
     var tileGroup: MutableList<TileGroup>,
     @JsonProperty("metadata")
-    var metadata: MutableList<Metadata>,
+    var metadata: MutableList<SceneMetadata>,
     @JsonIgnore
     var tileGfx: Array<TileGfx>,
     @JsonIgnore

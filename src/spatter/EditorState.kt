@@ -6,7 +6,7 @@ import rain.api.Input
 import rain.api.Window
 import rain.api.gfx.ResourceFactory
 import rain.api.scene.Scene
-import spatter.entity.EditEntityDialog
+import spatter.entity.EntityEditor
 import spatter.entity.NewEntityDialog
 import spatter.tilemap.TilemapEditor
 import spatter.tilemap.TilemapPropertiesPanel
@@ -17,8 +17,8 @@ class EditorState(private val window: Window, stateManager: StateManager): State
     private lateinit var materialPropertiesPanel: MaterialPropertiesPanel
     private lateinit var tilemapPropertiesPanel: TilemapPropertiesPanel
     private lateinit var tilemapEditor: TilemapEditor
+    private lateinit var entityEditor: EntityEditor
     private lateinit var newEntityDialog: NewEntityDialog
-    private lateinit var editEntityDialog: EditEntityDialog
 
     override fun init(resourceFactory: ResourceFactory, scene: Scene) {
         setupEditorStyle()
@@ -26,10 +26,10 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         tilemapPropertiesPanel = TilemapPropertiesPanel(window)
         materialPropertiesPanel = MaterialPropertiesPanel(window)
         newEntityDialog = NewEntityDialog(window)
-        editEntityDialog = EditEntityDialog(window)
         toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel, newEntityDialog)
         tilemapEditor = TilemapEditor(resourceFactory, scene)
-        resourcePanel = ResourcePanel(window, editEntityDialog)
+        entityEditor = EntityEditor(resourceFactory, scene)
+        resourcePanel = ResourcePanel(window)
     }
 
     override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input) {
@@ -37,9 +37,19 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         toolsPanel.update()
         resourcePanel.update()
         materialPropertiesPanel.update()
-        tilemapEditor.update(input)
         newEntityDialog.update(currentProjectScene, resourcePanel)
-        editEntityDialog.update(currentProjectScene, resourcePanel)
+
+        tilemapEditor.update(input)
+        entityEditor.update(input)
+
+        if (input.keyState(Input.Key.KEY_T) == Input.InputState.PRESSED) {
+            entityEditor.entityEditorProperties.visible = false
+            tilemapEditor.tilemapEditorProperties.show(tilemapEditor.tilemapTexture)
+        }
+        else if (input.keyState(Input.Key.KEY_E) == Input.InputState.PRESSED) {
+            tilemapEditor.tilemapEditorProperties.visible = false
+            entityEditor.entityEditorProperties.show(currentProjectScene, entityEditor.spriteTexture)
+        }
 
         if (tilemapPropertiesPanel.created) {
             tilemapEditor.createTilemap(

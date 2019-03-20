@@ -38,7 +38,7 @@ class NewEntityDialog(private val window: Window) {
             }
             else {
                 panel.visible = false
-                val entity = ProjectEntity(mutableListOf(), mutableListOf())
+                val entity = ProjectEntity("materialName", mutableListOf(), mutableListOf())
                 projectScene.entities[entityNameField.string] = entity
                 resourcePanel.recreateEntitiesList(projectScene)
             }

@@ -7,10 +7,10 @@ import rain.api.gfx.ResourceFactory
 import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
 import rain.api.scene.Scene
-import rain.api.scene.TileGfx
 import rain.api.scene.TileGfxNone
 import rain.api.scene.Tilemap
-import spatter.Metadata
+import spatter.SceneMetadata
+import spatter.TOOLS_PANEL_HEIGHT
 import spatter.editorSkin
 
 class TilemapEditorProperties(private val window: Window) {
@@ -52,18 +52,22 @@ class TilemapEditorProperties(private val window: Window) {
         layout.gridH = 50.0f
 
         tileSelectorPanel = guiManagerCreatePanel(layout)
-        tileSelectorPanel.w = 400.0f
-        tileSelectorPanel.h = 400.0f
+        tileSelectorPanel.w = 300.0f
+        tileSelectorPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
         tileSelectorPanel.skin = editorSkin
         tileSelectorPanel.visible = false
+        tileSelectorPanel.moveable = false
+        tileSelectorPanel.resizable = false
 
         tileLayerLayout.componentsPerRow = 2
         tileLayerLayout.componentHeight = 20.0f
         tileLayerPanel = guiManagerCreatePanel(tileLayerLayout)
-        tileLayerPanel.w = 200.0f
-        tileLayerPanel.h = 400.0f
+        tileLayerPanel.w = 300.0f
+        tileLayerPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
         tileLayerPanel.skin = editorSkin
         tileLayerPanel.visible = false
+        tileLayerPanel.moveable = false
+        tileLayerPanel.resizable = false
 
         createTileLayerLabel = tileLayerPanel.createLabel("Layers")
         createTileLayerButton = tileLayerPanel.createButton("+")
@@ -71,19 +75,25 @@ class TilemapEditorProperties(private val window: Window) {
         metadataLayout.componentsPerRow = 2
         metadataLayout.componentHeight = 24.0f
         metadataPanel = guiManagerCreatePanel(metadataLayout)
-        metadataPanel.w = 200.0f
-        metadataPanel.h = 400.0f
+        metadataPanel.w = 300.0f
+        metadataPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
         metadataPanel.skin = editorSkin
+        metadataPanel.resizable = false
+        metadataPanel.moveable = false
+        metadataPanel.visible = false
         newMetadataEntryLabel = metadataPanel.createLabel("New Metadata")
         newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
     fun update(selectedTilemapData: TilemapData?, tileMaterial: Material, scene: Scene, resourceFactory: ResourceFactory) {
-        tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
-        tileSelectorPanel.y = tileLayerPanel.y
+        tileLayerPanel.x = window.size.x - tileLayerPanel.w
+        tileLayerPanel.y = TOOLS_PANEL_HEIGHT
 
-        metadataPanel.x = tileLayerPanel.x - metadataPanel.w
-        metadataPanel.y = tileLayerPanel.y
+        tileSelectorPanel.x = window.size.x - tileSelectorPanel.w
+        tileSelectorPanel.y = tileLayerPanel.y + tileLayerPanel.h
+
+        metadataPanel.x = window.size.x - metadataPanel.w
+        metadataPanel.y = tileSelectorPanel.y + tileSelectorPanel.h
 
         if (selectedTilemapData != null) {
             populateActiveLayerButtons(selectedTilemapData)
@@ -151,7 +161,7 @@ class TilemapEditorProperties(private val window: Window) {
             }
 
             if (newMetadataEntryButton.clicked) {
-                val metadata = Metadata("name", "value")
+                val metadata = SceneMetadata("name", "value")
                 selectedTilemapData.activeLayer.metadata.add(metadata)
 
                 val nameField = metadataPanel.createTextField(metadata.name)

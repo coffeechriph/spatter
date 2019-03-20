@@ -6,6 +6,8 @@ import spatter.entity.NewEntityDialog
 import spatter.tilemap.TilemapPropertiesPanel
 import java.io.File
 
+const val TOOLS_PANEL_HEIGHT = 34.0f
+
 class ToolsPanel(private val window: Window,
                  private val materialProperties: MaterialPropertiesPanel,
                  private val tilemapProperties: TilemapPropertiesPanel,
@@ -28,7 +30,7 @@ class ToolsPanel(private val window: Window,
         panel.x = 0.0f
         panel.y = 0.0f
         panel.w = window.size.x.toFloat()
-        panel.h = 34.0f
+        panel.h = TOOLS_PANEL_HEIGHT
         panel.moveable = false
         panel.resizable = false
 

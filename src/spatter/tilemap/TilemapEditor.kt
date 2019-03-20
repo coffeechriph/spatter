@@ -17,17 +17,16 @@ import kotlin.collections.HashSet
 
 class TilemapEditor(private val resourceFactory: ResourceFactory, private val scene: Scene) {
     // TODO: Replace these with dynamic materials
-    private var tilemapTexture: Texture2d
+    var tilemapEditorProperties: TilemapEditorProperties
+    var tilemapTexture: Texture2d
+    var editMode: EditMode = EditMode.MOVE
     private var tilemapMaterial: Material
     private val guiMaterial: Material
 
-    var editMode: EditMode = EditMode.MOVE
     private var selectedTilemapData: TilemapData? = null
     private var beginMovePosition = false
     private var movePosition = false
     private var moveDiffStart = Vector2f(0.0f, 0.0f)
-
-    private var tilemapEditorProperties: TilemapEditorProperties
 
     init {
         tilemapTexture = resourceFactory.buildTexture2d()
@@ -46,7 +45,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             .build()
 
         guiMaterial = resourceFactory.buildMaterial()
-            .withName("tilemapMaterial")
+            .withName("tilemapGuiMaterial")
             .withVertexShader("./data/shaders/guiv2.vert.spv")
             .withFragmentShader("./data/shaders/gui.frag.spv")
             .withTexture(tilemapTexture)
@@ -90,56 +89,51 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
 
     fun update(input: Input) {
         tilemapEditorProperties.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
+        if (tilemapEditorProperties.visible) {
 
-        if (input.keyState(Input.Key.KEY_1) == Input.InputState.PRESSED) {
-            editMode = EditMode.MOVE
-            tilemapEditorProperties.visible = false
-        }
-        else if (input.keyState(Input.Key.KEY_2) == Input.InputState.PRESSED) {
-            editMode = EditMode.EDIT
-
-            if (!tilemapEditorProperties.visible) {
-                tilemapEditorProperties.show(tilemapTexture)
+            if (input.keyState(Input.Key.KEY_1) == Input.InputState.PRESSED) {
+                editMode = EditMode.MOVE
+            } else if (input.keyState(Input.Key.KEY_2) == Input.InputState.PRESSED) {
+                editMode = EditMode.EDIT
             }
-        }
 
-        if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
-            if (editMode == EditMode.MOVE) {
-                selectTilemap(input.mousePosition.x, input.mousePosition.y)
-                if (selectedTilemapData != null) {
-                    if (!movePosition && !beginMovePosition) {
-                        beginMovePosition = true
+            if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
+                if (editMode == EditMode.MOVE) {
+                    selectTilemap(input.mousePosition.x, input.mousePosition.y)
+                    if (selectedTilemapData != null) {
+                        if (!movePosition && !beginMovePosition) {
+                            beginMovePosition = true
+                        }
                     }
                 }
-            }
-        }
-        else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN) {
-            if (beginMovePosition) {
-                beginMovePosition = false
-                movePosition = true
+            } else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN) {
+                if (beginMovePosition) {
+                    beginMovePosition = false
+                    movePosition = true
 
+                    for (layer in selectedTilemapData!!.layers) {
+                        moveDiffStart.x = input.mousePosition.x.toFloat() - layer.tilemapRef.transform.x
+                        moveDiffStart.y = input.mousePosition.y.toFloat() - layer.tilemapRef.transform.y
+                    }
+                }
+            } else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.RELEASED) {
+                beginMovePosition = false
+                movePosition = false
+            }
+
+            if (movePosition && selectedTilemapData != null) {
                 for (layer in selectedTilemapData!!.layers) {
-                    moveDiffStart.x = input.mousePosition.x.toFloat() - layer.tilemapRef.transform.x
-                    moveDiffStart.y = input.mousePosition.y.toFloat() - layer.tilemapRef.transform.y
+                    layer.tilemapRef.transform.x = input.mousePosition.x.toFloat() - moveDiffStart.x
+                    layer.tilemapRef.transform.y = input.mousePosition.y.toFloat() - moveDiffStart.y
                 }
             }
-        }
-        else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.RELEASED) {
-            beginMovePosition = false
-            movePosition = false
-        }
 
-        if (movePosition && selectedTilemapData != null) {
-            for (layer in selectedTilemapData!!.layers) {
-                layer.tilemapRef.transform.x = input.mousePosition.x.toFloat() - moveDiffStart.x
-                layer.tilemapRef.transform.y = input.mousePosition.y.toFloat() - moveDiffStart.y
-            }
-        }
-
-        if (editMode == EditMode.EDIT) {
-            if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
-                input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN) {
-                editTilemap(input.mousePosition.x, input.mousePosition.y)
+            if (editMode == EditMode.EDIT) {
+                if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
+                    input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN
+                ) {
+                    editTilemap(input.mousePosition.x, input.mousePosition.y)
+                }
             }
         }
     }
