@@ -4,11 +4,22 @@ import rain.api.Window
 import rain.api.gui.v2.ListItem
 import rain.api.gui.v2.TreeView
 import rain.api.gui.v2.guiManagerCreateTreeView
+import spatter.entity.EditEntityDialog
 
-class ResourcePanel(private val window: Window) {
+class ResourcePanel(private val window: Window, private val editEntityDialog: EditEntityDialog) {
     private val treeView: TreeView
     private val entitiesListItem: ListItem
     private val entities = ArrayList<ListItem>()
+
+    fun getSelectedEntityItem(): ListItem? {
+        if (treeView.selectedItem != null) {
+            if (entities.contains(treeView.selectedItem!!)) {
+                return treeView.selectedItem
+            }
+        }
+
+        return null
+    }
 
     init {
         treeView = guiManagerCreateTreeView()
@@ -22,6 +33,10 @@ class ResourcePanel(private val window: Window) {
     }
 
     fun update() {
+        if (treeView.selectedItem != null && entities.contains(treeView.selectedItem!!)) {
+            editEntityDialog.show()
+        }
+
         treeView.h = window.size.y.toFloat() - treeView.y
     }
 
