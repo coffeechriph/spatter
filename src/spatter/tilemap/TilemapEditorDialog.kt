@@ -21,6 +21,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var tileEditorToolPanel: Panel
     private var tileEditorMoveButton: ToggleButton
     private val tileEditorEditButton: ToggleButton
+    private val tileEditorRemoveButton: ToggleButton
 
     private var createTileLayerLabel: Label
     private var createTileLayerButton: Button
@@ -45,7 +46,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
 
     init {
         val tileToolPanelLayout = FillRowLayout()
-        tileToolPanelLayout.componentsPerRow = 2
+        tileToolPanelLayout.componentsPerRow = 3
         tileEditorToolPanel = guiManagerCreatePanel(tileToolPanelLayout)
         tileEditorToolPanel.h = 30.0f
         tileEditorToolPanel.w = 300.0f
@@ -56,6 +57,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
         tileEditorMoveButton = tileEditorToolPanel.createToggleButton("Move")
         tileEditorMoveButton.checked = true
         tileEditorEditButton = tileEditorToolPanel.createToggleButton("Edit")
+        tileEditorRemoveButton = tileEditorToolPanel.createToggleButton("Remove")
 
         layout.gridW = 50.0f
         layout.gridH = 50.0f
@@ -110,11 +112,18 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
 
         if (tileEditorMoveButton.clicked) {
             tileEditorEditButton.checked = false
+            tileEditorRemoveButton.checked = false
             selectedEditorMode = EditMode.MOVE
         }
         else if (tileEditorEditButton.clicked){
             tileEditorMoveButton.checked = false
+            tileEditorRemoveButton.checked = false
             selectedEditorMode = EditMode.EDIT
+        }
+        else if (tileEditorRemoveButton.clicked){
+            tileEditorMoveButton.checked = false
+            tileEditorEditButton.checked = false
+            selectedEditorMode = EditMode.REMOVE
         }
 
         if (updateTileSelector) {

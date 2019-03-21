@@ -121,13 +121,22 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
                 if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
                     input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN
                 ) {
-                    editTilemap(input.mousePosition.x, input.mousePosition.y)
+                    editTilemap(input.mousePosition.x, input.mousePosition.y,
+                        tilemapEditorDialog.selectedTileIndex.x,
+                        tilemapEditorDialog.selectedTileIndex.y)
+                }
+            }
+            else if (tilemapEditorDialog.selectedEditorMode == EditMode.REMOVE) {
+                if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
+                    input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN
+                ) {
+                    editTilemap(input.mousePosition.x, input.mousePosition.y, -1, -1)
                 }
             }
         }
     }
 
-    private fun editTilemap(x: Int, y: Int) {
+    private fun editTilemap(x: Int, y: Int, imageX: Int, imageY: Int) {
         if (selectedTilemapData != null) {
             val activeTilemapLayer = selectedTilemapData!!.activeLayer.tilemapRef
             val tx = ((x - activeTilemapLayer.transform.x) / activeTilemapLayer.tileWidth).toInt()
@@ -135,16 +144,20 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
 
             if (tx >= 0 && tx < activeTilemapLayer.tileNumX &&
                 ty >= 0 && ty < activeTilemapLayer.tileNumY) {
-                val imageX = tilemapEditorDialog.selectedTileIndex.x
-                val imageY = tilemapEditorDialog.selectedTileIndex.y
                 val tileIndex = tx + ty * activeTilemapLayer.tileNumX
                 val activeLayer = selectedTilemapData!!.activeLayer
 
                 val oldGroup = findGroupMatchingIndex(activeLayer, tileIndex)
                 oldGroup.ifPresent { group -> group.tileIndicesIntoMap.remove(tileIndex) }
 
-                val tileGroup = findGroupMatchingTile(activeLayer, imageX, imageY)
-                tileGroup.ifPresentOrElse({group -> group.tileIndicesIntoMap.add(tileIndex)}, {createNewTileGroupWithTile(activeLayer, imageX, imageY, tileIndex)})
+                // Image index of -1 means that no tile should be present
+                // Don't add it to a tile group
+                if (imageX > -1 && imageY > -1) {
+                    val tileGroup = findGroupMatchingTile(activeLayer, imageX, imageY)
+                    tileGroup.ifPresentOrElse(
+                        { group -> group.tileIndicesIntoMap.add(tileIndex) },
+                        { createNewTileGroupWithTile(activeLayer, imageX, imageY, tileIndex) })
+                }
 
                 selectedTilemapData!!.activeLayer.tileGfx[tileIndex] = TileGfx(imageX, imageY)
                 activeTilemapLayer.update(selectedTilemapData!!.activeLayer.tileGfx)
