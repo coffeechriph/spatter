@@ -9,16 +9,18 @@ import rain.api.gui.v2.*
 import rain.api.scene.Scene
 import rain.api.scene.TileGfxNone
 import rain.api.scene.Tilemap
-import spatter.SceneMetadata
-import spatter.TOOLS_PANEL_HEIGHT
-import spatter.editorSkin
+import spatter.*
 
-class TilemapEditorProperties(private val window: Window) {
+class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var layout: GridLayout = GridLayout()
     private var tileLayerLayout = FillRowLayout()
     private var tileSelectorPanel: Panel
     private var tileLayerPanel: Panel
     private var metadataPanel: Panel
+
+    private var tileEditorToolPanel: Panel
+    private var tileEditorMoveButton: ToggleButton
+    private val tileEditorEditButton: ToggleButton
 
     private var createTileLayerLabel: Label
     private var createTileLayerButton: Button
@@ -32,28 +34,36 @@ class TilemapEditorProperties(private val window: Window) {
 
     private var currentActiveMetadata = ArrayList<TextField>()
 
-    var visible = false
-        set(value) {
-            field = value
-            tileSelectorPanel.visible = value
-            tileLayerPanel.visible = value
-            metadataPanel.visible = value
-        }
-        get() {
-            return tileSelectorPanel.visible
-        }
-    var created = false
-        private set
     var selectedTileIndex: Vector2i = Vector2i(0,0)
+        private set
+    var selectedEditorMode: EditMode = EditMode.MOVE
+        private set
 
-    val images = ArrayList<Image>()
+    private val images = ArrayList<Image>()
+
+    private var updateTileSelector = false
+
     init {
+        val tileToolPanelLayout = FillRowLayout()
+        tileToolPanelLayout.componentsPerRow = 2
+        tileEditorToolPanel = guiManagerCreatePanel(tileToolPanelLayout)
+        tileEditorToolPanel.h = 30.0f
+        tileEditorToolPanel.w = 300.0f
+        tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
+        tileEditorToolPanel.skin = editorSkin
+        tileEditorToolPanel.visible = false
+
+        tileEditorMoveButton = tileEditorToolPanel.createToggleButton("Move")
+        tileEditorMoveButton.checked = true
+        tileEditorEditButton = tileEditorToolPanel.createToggleButton("Edit")
+
         layout.gridW = 50.0f
         layout.gridH = 50.0f
 
+        val panelHeight = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f - 10.0f
         tileSelectorPanel = guiManagerCreatePanel(layout)
         tileSelectorPanel.w = 300.0f
-        tileSelectorPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
+        tileSelectorPanel.h = panelHeight
         tileSelectorPanel.skin = editorSkin
         tileSelectorPanel.visible = false
         tileSelectorPanel.moveable = false
@@ -63,7 +73,7 @@ class TilemapEditorProperties(private val window: Window) {
         tileLayerLayout.componentHeight = 20.0f
         tileLayerPanel = guiManagerCreatePanel(tileLayerLayout)
         tileLayerPanel.w = 300.0f
-        tileLayerPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
+        tileLayerPanel.h = panelHeight
         tileLayerPanel.skin = editorSkin
         tileLayerPanel.visible = false
         tileLayerPanel.moveable = false
@@ -76,7 +86,7 @@ class TilemapEditorProperties(private val window: Window) {
         metadataLayout.componentHeight = 24.0f
         metadataPanel = guiManagerCreatePanel(metadataLayout)
         metadataPanel.w = 300.0f
-        metadataPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
+        metadataPanel.h = panelHeight
         metadataPanel.skin = editorSkin
         metadataPanel.resizable = false
         metadataPanel.moveable = false
@@ -86,14 +96,56 @@ class TilemapEditorProperties(private val window: Window) {
     }
 
     fun update(selectedTilemapData: TilemapData?, tileMaterial: Material, scene: Scene, resourceFactory: ResourceFactory) {
+        tileEditorToolPanel.x = window.size.x - tileEditorToolPanel.w
+        tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
+
         tileLayerPanel.x = window.size.x - tileLayerPanel.w
-        tileLayerPanel.y = TOOLS_PANEL_HEIGHT
+        tileLayerPanel.y = TOOLS_PANEL_HEIGHT + tileEditorToolPanel.y
 
         tileSelectorPanel.x = window.size.x - tileSelectorPanel.w
         tileSelectorPanel.y = tileLayerPanel.y + tileLayerPanel.h
 
         metadataPanel.x = window.size.x - metadataPanel.w
         metadataPanel.y = tileSelectorPanel.y + tileSelectorPanel.h
+
+        if (tileEditorMoveButton.clicked) {
+            tileEditorEditButton.checked = false
+            selectedEditorMode = EditMode.MOVE
+        }
+        else if (tileEditorEditButton.clicked){
+            tileEditorMoveButton.checked = false
+            selectedEditorMode = EditMode.EDIT
+        }
+
+        if (updateTileSelector) {
+            updateTileSelector = false
+            for (image in images) {
+                tileSelectorPanel.removeComponent(image)
+            }
+
+            val numTilesX = tileMaterial.getTexture2d()[0].getWidth() / tileMaterial.getTexture2d()[0].getTileWidthPixels()
+            val numTilesY = tileMaterial.getTexture2d()[0].getHeight() / tileMaterial.getTexture2d()[0].getTileHeightPixels()
+
+            var tx = 0
+            var ty = 0
+            for (i in 0 until numTilesX*numTilesY) {
+                val image = tileSelectorPanel.createImage(tx, ty, "")
+                images.add(image)
+
+                tx += 1
+                if (tx >= numTilesX) {
+                    tx = 0
+                    ty += 1
+                }
+            }
+
+            tileLayerPanel.x = window.size.x - tileLayerPanel.w - tileSelectorPanel.w
+            tileLayerPanel.y = window.size.y - tileLayerPanel.h - tileSelectorPanel.h
+            tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
+            tileSelectorPanel.y = tileLayerPanel.y
+            metadataPanel.x = tileLayerPanel.x - metadataPanel.w
+            metadataPanel.y = tileLayerPanel.y
+        }
 
         if (selectedTilemapData != null) {
             populateActiveLayerButtons(selectedTilemapData)
@@ -147,13 +199,8 @@ class TilemapEditorProperties(private val window: Window) {
                 tilemap.transform.y = selectedTilemapData.activeLayer.tilemapRef.transform.y
                 tilemap.transform.z = selectedTilemapData.activeLayer.tilemapRef.transform.z + 1.0f
 
-                val defaultIndexSet = HashSet<Int>()
-                for (i in 0 until selectedTilemapData.tileNumX*selectedTilemapData.tileNumX) {
-                    defaultIndexSet.add(i)
-                }
-                val defaultGroup = TileGroup(0, 0, defaultIndexSet)
                 val newLayer =
-                    TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), tileGfx, tilemap)
+                    TilemapLayer(mutableListOf(), mutableListOf(), tileGfx, tilemap)
                 selectedTilemapData.layers.add(newLayer)
 
                 val button = tileLayerPanel.createToggleButton("Layer:${currentActiveLayers.size}")
@@ -188,8 +235,6 @@ class TilemapEditorProperties(private val window: Window) {
                 index += 1
             }
         }
-
-        created = false
 
         for(image in images) {
             if (image.clicked) {
@@ -233,37 +278,22 @@ class TilemapEditorProperties(private val window: Window) {
         }
     }
 
-    fun show(selectedTilemapTexture: Texture2d) {
-        if (!tileSelectorPanel.visible) {
-            for (image in images) {
-                tileSelectorPanel.removeComponent(image)
-            }
+    override fun shown(): Boolean {
+        return tileSelectorPanel.visible
+    }
 
-            val numTilesX = selectedTilemapTexture.getWidth() / selectedTilemapTexture.getTileWidthPixels()
-            val numTilesY = selectedTilemapTexture.getHeight() / selectedTilemapTexture.getTileHeightPixels()
+    override fun hide() {
+        tileSelectorPanel.visible = false
+        tileLayerPanel.visible = false
+        metadataPanel.visible = false
+        tileEditorToolPanel.visible = false
+    }
 
-            var tx = 0
-            var ty = 0
-            for (i in 0 until numTilesX*numTilesY) {
-                val image = tileSelectorPanel.createImage(tx, ty, "")
-                images.add(image)
-
-                tx += 1
-                if (tx >= numTilesX) {
-                    tx = 0
-                    ty += 1
-                }
-            }
-
-            tileLayerPanel.x = window.size.x - tileLayerPanel.w - tileSelectorPanel.w
-            tileLayerPanel.y = window.size.y - tileLayerPanel.h - tileSelectorPanel.h
-            tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
-            tileSelectorPanel.y = tileLayerPanel.y
-            metadataPanel.x = tileLayerPanel.x - metadataPanel.w
-            metadataPanel.y = tileLayerPanel.y
-        }
+    override fun show() {
+        updateTileSelector = true
         tileSelectorPanel.visible = true
         tileLayerPanel.visible = true
         metadataPanel.visible = true
+        tileEditorToolPanel.visible = true
     }
 }

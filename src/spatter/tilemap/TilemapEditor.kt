@@ -15,11 +15,9 @@ import spatter.currentProjectScene
 import java.util.*
 import kotlin.collections.HashSet
 
-class TilemapEditor(private val resourceFactory: ResourceFactory, private val scene: Scene) {
+class TilemapEditor(private val resourceFactory: ResourceFactory, private val scene: Scene, private val tilemapEditorDialog: TilemapEditorDialog) {
     // TODO: Replace these with dynamic materials
-    var tilemapEditorProperties: TilemapEditorProperties
-    var tilemapTexture: Texture2d
-    var editMode: EditMode = EditMode.MOVE
+    private var tilemapTexture: Texture2d
     private var tilemapMaterial: Material
     private val guiMaterial: Material
 
@@ -52,8 +50,6 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             .withBlendEnabled(true)
             .build()
         guiManagerSetMaterial(guiMaterial)
-
-        tilemapEditorProperties = TilemapEditorProperties(scene.window)
     }
 
     fun createTilemap(numTileX: Int, numTileY: Int, tileW: Float, tileH: Float) {
@@ -88,17 +84,10 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     }
 
     fun update(input: Input) {
-        tilemapEditorProperties.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
-        if (tilemapEditorProperties.visible) {
-
-            if (input.keyState(Input.Key.KEY_1) == Input.InputState.PRESSED) {
-                editMode = EditMode.MOVE
-            } else if (input.keyState(Input.Key.KEY_2) == Input.InputState.PRESSED) {
-                editMode = EditMode.EDIT
-            }
-
+        tilemapEditorDialog.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
+        if (tilemapEditorDialog.shown()) {
             if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
-                if (editMode == EditMode.MOVE) {
+                if (tilemapEditorDialog.selectedEditorMode == EditMode.MOVE) {
                     selectTilemap(input.mousePosition.x, input.mousePosition.y)
                     if (selectedTilemapData != null) {
                         if (!movePosition && !beginMovePosition) {
@@ -128,7 +117,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
                 }
             }
 
-            if (editMode == EditMode.EDIT) {
+            if (tilemapEditorDialog.selectedEditorMode == EditMode.EDIT) {
                 if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
                     input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN
                 ) {
@@ -146,8 +135,8 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
 
             if (tx >= 0 && tx < activeTilemapLayer.tileNumX &&
                 ty >= 0 && ty < activeTilemapLayer.tileNumY) {
-                val imageX = tilemapEditorProperties.selectedTileIndex.x
-                val imageY = tilemapEditorProperties.selectedTileIndex.y
+                val imageX = tilemapEditorDialog.selectedTileIndex.x
+                val imageY = tilemapEditorDialog.selectedTileIndex.y
                 val tileIndex = tx + ty * activeTilemapLayer.tileNumX
                 val activeLayer = selectedTilemapData!!.activeLayer
 

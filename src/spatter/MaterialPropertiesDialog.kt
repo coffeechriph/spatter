@@ -3,7 +3,7 @@ package spatter
 import rain.api.Window
 import rain.api.gui.v2.*
 
-class MaterialPropertiesPanel(window: Window) {
+class MaterialPropertiesDialog(window: Window): EditorDialog {
     private val panel: Panel
     private val selectVertexShader: Button
     private val vertexShaderLabel: Label
@@ -14,14 +14,6 @@ class MaterialPropertiesPanel(window: Window) {
     private val doneButton: Button
     private val fileChooseDialog: FileChooseDialog
     private var resourceSelectionType = 0
-    var visible = false
-        get() {
-            return panel.visible
-        }
-        set(value) {
-            field = value
-            panel.visible = false
-        }
 
     init {
         val layout = FillRowLayout()
@@ -76,7 +68,15 @@ class MaterialPropertiesPanel(window: Window) {
         }
     }
 
-    fun show() {
+    override fun shown(): Boolean {
+        return panel.visible
+    }
+
+    override fun hide() {
+        panel.visible = false
+    }
+
+    override fun show() {
         panel.visible = true
     }
 }

@@ -7,54 +7,53 @@ import rain.api.Window
 import rain.api.gfx.ResourceFactory
 import rain.api.scene.Scene
 import spatter.entity.EntityEditor
+import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
 import spatter.tilemap.TilemapEditor
-import spatter.tilemap.TilemapPropertiesPanel
+import spatter.tilemap.NewTilemapDialog
+import spatter.tilemap.TilemapEditorDialog
 
 class EditorState(private val window: Window, stateManager: StateManager): State(stateManager) {
     private lateinit var toolsPanel: ToolsPanel
-    private lateinit var materialPropertiesPanel: MaterialPropertiesPanel
-    private lateinit var tilemapPropertiesPanel: TilemapPropertiesPanel
     private lateinit var tilemapEditor: TilemapEditor
     private lateinit var entityEditor: EntityEditor
+
+    private lateinit var tilemapEditorDialog: TilemapEditorDialog
+    private lateinit var materialPropertiesDialog: MaterialPropertiesDialog
+    private lateinit var newTilemapDialog: NewTilemapDialog
     private lateinit var newEntityDialog: NewEntityDialog
+    private lateinit var entityEditorDialog: EntityEditorDialog
 
     override fun init(resourceFactory: ResourceFactory, scene: Scene) {
         setupEditorStyle()
 
-        tilemapPropertiesPanel = TilemapPropertiesPanel(window)
-        materialPropertiesPanel = MaterialPropertiesPanel(window)
-        entityEditor = EntityEditor(resourceFactory, scene)
+        newTilemapDialog = NewTilemapDialog(window)
+        tilemapEditorDialog = TilemapEditorDialog(window)
+        materialPropertiesDialog = MaterialPropertiesDialog(window)
         newEntityDialog = NewEntityDialog(window)
-        toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel, tilemapEditor.tilemapEditorProperties,
-            newEntityDialog, entityEditor.entityEditorProperties)
-        tilemapEditor = TilemapEditor(resourceFactory, scene)
+        entityEditorDialog = EntityEditorDialog(window)
+
+        entityEditor = EntityEditor(resourceFactory, scene, entityEditorDialog)
+        tilemapEditor = TilemapEditor(resourceFactory, scene, tilemapEditorDialog)
+        toolsPanel = ToolsPanel(window, materialPropertiesDialog, newTilemapDialog, tilemapEditorDialog,
+            newEntityDialog, entityEditorDialog)
     }
 
     override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input) {
         toolsPanel.update()
-        tilemapPropertiesPanel.update()
-        materialPropertiesPanel.update()
+        newTilemapDialog.update()
+        materialPropertiesDialog.update()
         newEntityDialog.update(currentProjectScene)
 
         tilemapEditor.update(input)
         entityEditor.update(input)
 
-        if (input.keyState(Input.Key.KEY_T) == Input.InputState.PRESSED) {
-            entityEditor.entityEditorProperties.visible = false
-            tilemapEditor.tilemapEditorProperties.show(tilemapEditor.tilemapTexture)
-        }
-        else if (input.keyState(Input.Key.KEY_E) == Input.InputState.PRESSED) {
-            tilemapEditor.tilemapEditorProperties.visible = false
-            entityEditor.entityEditorProperties.show(currentProjectScene, entityEditor.spriteTexture)
-        }
-
-        if (tilemapPropertiesPanel.created) {
+        if (newTilemapDialog.created) {
             tilemapEditor.createTilemap(
-                tilemapPropertiesPanel.numTileX,
-                tilemapPropertiesPanel.numTileY,
-                tilemapPropertiesPanel.tileW.toFloat(),
-                tilemapPropertiesPanel.tileH.toFloat())
+                newTilemapDialog.numTileX,
+                newTilemapDialog.numTileY,
+                newTilemapDialog.tileW.toFloat(),
+                newTilemapDialog.tileH.toFloat())
         }
     }
 

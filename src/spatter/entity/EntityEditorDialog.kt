@@ -5,12 +5,9 @@ import rain.api.Window
 import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
 import rain.assertion
-import spatter.ProjectScene
-import spatter.SceneMetadata
-import spatter.TOOLS_PANEL_HEIGHT
-import spatter.editorSkin
+import spatter.*
 
-class EntityEditorProperties(private val window: Window) {
+class EntityEditorDialog(private val window: Window): EditorDialog {
     private var layout: GridLayout = GridLayout()
     private var entityTypeLayout = FillRowLayout()
     private var imageSelectorPanel: Panel
@@ -25,21 +22,16 @@ class EntityEditorProperties(private val window: Window) {
     private var currentProjectEntities = ArrayList<ToggleButton>()
     private var currentActiveMetadata = ArrayList<TextField>()
 
+    var selectedImageIndex: Vector2i = Vector2i(0,0)
     var visible = false
-        set(value) {
-            field = value
-            imageSelectorPanel.visible = value
-            entityTypePanel.visible = value
-            metadataPanel.visible = value
-        }
         get() {
             return imageSelectorPanel.visible
         }
-    var created = false
         private set
-    var selectedImageIndex: Vector2i = Vector2i(0,0)
 
-    val images = ArrayList<Image>()
+    private val images = ArrayList<Image>()
+    private var updateImageSelector = false
+
     init {
         layout.gridW = 50.0f
         layout.gridH = 50.0f
@@ -75,7 +67,7 @@ class EntityEditorProperties(private val window: Window) {
         newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
-    fun update(projectScene: ProjectScene) {
+    fun update(projectScene: ProjectScene, selectedTilemapTexture: Texture2d) {
         entityTypePanel.x = window.size.x - entityTypePanel.w
         entityTypePanel.y = TOOLS_PANEL_HEIGHT
 
@@ -84,6 +76,37 @@ class EntityEditorProperties(private val window: Window) {
 
         metadataPanel.x = window.size.x - metadataPanel.w
         metadataPanel.y = imageSelectorPanel.y + imageSelectorPanel.h
+
+        if (updateImageSelector) {
+            updateImageSelector = false
+            populateCurrentEntitiesButton(projectScene)
+            for (image in images) {
+                imageSelectorPanel.removeComponent(image)
+            }
+
+            val numTilesX = selectedTilemapTexture.getWidth() / selectedTilemapTexture.getTileWidthPixels()
+            val numTilesY = selectedTilemapTexture.getHeight() / selectedTilemapTexture.getTileHeightPixels()
+
+            var tx = 0
+            var ty = 0
+            for (i in 0 until numTilesX*numTilesY) {
+                val image = imageSelectorPanel.createImage(tx, ty, "")
+                images.add(image)
+
+                tx += 1
+                if (tx >= numTilesX) {
+                    tx = 0
+                    ty += 1
+                }
+            }
+
+            entityTypePanel.x = window.size.x - entityTypePanel.w - imageSelectorPanel.w
+            entityTypePanel.y = window.size.y - entityTypePanel.h - imageSelectorPanel.h
+            imageSelectorPanel.x = entityTypePanel.x + entityTypePanel.w
+            imageSelectorPanel.y = entityTypePanel.y
+            metadataPanel.x = entityTypePanel.x - metadataPanel.w
+            metadataPanel.y = entityTypePanel.y
+        }
 
         // Select a new entity
         for (i in 0 until currentProjectEntities.size) {
@@ -131,8 +154,6 @@ class EntityEditorProperties(private val window: Window) {
             index += 1
         }
 
-        created = false
-
         for(image in images) {
             if (image.clicked) {
                 selectedImageIndex = Vector2i(image.imageTileIndexX, image.imageTileIndexY)
@@ -166,36 +187,18 @@ class EntityEditorProperties(private val window: Window) {
         }
     }
 
-    fun show(projectScene: ProjectScene, selectedTilemapTexture: Texture2d) {
-        populateCurrentEntitiesButton(projectScene)
-        if (!imageSelectorPanel.visible) {
-            for (image in images) {
-                imageSelectorPanel.removeComponent(image)
-            }
+    override fun shown(): Boolean {
+        return imageSelectorPanel.visible
+    }
 
-            val numTilesX = selectedTilemapTexture.getWidth() / selectedTilemapTexture.getTileWidthPixels()
-            val numTilesY = selectedTilemapTexture.getHeight() / selectedTilemapTexture.getTileHeightPixels()
+    override fun hide() {
+        imageSelectorPanel.visible = false
+        entityTypePanel.visible = false
+        metadataPanel.visible = false
+    }
 
-            var tx = 0
-            var ty = 0
-            for (i in 0 until numTilesX*numTilesY) {
-                val image = imageSelectorPanel.createImage(tx, ty, "")
-                images.add(image)
-
-                tx += 1
-                if (tx >= numTilesX) {
-                    tx = 0
-                    ty += 1
-                }
-            }
-
-            entityTypePanel.x = window.size.x - entityTypePanel.w - imageSelectorPanel.w
-            entityTypePanel.y = window.size.y - entityTypePanel.h - imageSelectorPanel.h
-            imageSelectorPanel.x = entityTypePanel.x + entityTypePanel.w
-            imageSelectorPanel.y = entityTypePanel.y
-            metadataPanel.x = entityTypePanel.x - metadataPanel.w
-            metadataPanel.y = entityTypePanel.y
-        }
+    override fun show() {
+        updateImageSelector = true
         imageSelectorPanel.visible = true
         entityTypePanel.visible = true
         metadataPanel.visible = true

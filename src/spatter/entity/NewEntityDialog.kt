@@ -2,18 +2,11 @@ package spatter.entity
 
 import rain.api.Window
 import rain.api.gui.v2.*
+import spatter.EditorDialog
 import spatter.ProjectScene
 import spatter.editorSkin
 
-class NewEntityDialog(private val window: Window) {
-    var visible = false
-        get() {
-            return panel.visible
-        }
-        set(value) {
-            field = value
-            panel.visible = value
-        }
+class NewEntityDialog(private val window: Window): EditorDialog {
     private val panelLayout = FillRowLayout()
     private val panel: Panel
     private val entityNameLabel: Label
@@ -51,7 +44,15 @@ class NewEntityDialog(private val window: Window) {
         }
     }
 
-    fun show() {
+    override fun shown(): Boolean {
+        return panel.visible
+    }
+
+    override fun hide() {
+        panel.visible = false
+    }
+
+    override fun show() {
         if (!panel.visible) {
             panel.visible = true
             panel.x = window.size.x.toFloat() - panel.w

@@ -2,26 +2,28 @@ package spatter
 
 import rain.api.Window
 import rain.api.gui.v2.*
-import spatter.entity.EntityEditorProperties
+import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
-import spatter.tilemap.TilemapEditorProperties
-import spatter.tilemap.TilemapPropertiesPanel
+import spatter.tilemap.TilemapEditorDialog
+import spatter.tilemap.NewTilemapDialog
 import java.io.File
 
 const val TOOLS_PANEL_HEIGHT = 34.0f
 
 class ToolsPanel(private val window: Window,
-                 private val materialProperties: MaterialPropertiesPanel,
-                 private val tilemapProperties: TilemapPropertiesPanel,
-                 private val tilemapEditorProperties: TilemapEditorProperties,
+                 private val materialProperties: MaterialPropertiesDialog,
+                 private val newTilemapDialog: NewTilemapDialog,
+                 private val tilemapEditorDialog: TilemapEditorDialog,
                  private val newEntityDialog: NewEntityDialog,
-                 private val editEntityProperties: EntityEditorProperties
+                 private val editEntityDialog: EntityEditorDialog
 ) {
     private val panelLayout: GridLayout
     private val panel: Panel
     private val createMaterialButton: Button
     private val createTilemapButton: Button
     private val createEntityButton: Button
+    private val editTilemapButton: Button
+    private val editEntityButton: Button
     private val saveSceneButton: Button
 
     init {
@@ -41,6 +43,8 @@ class ToolsPanel(private val window: Window,
         createMaterialButton = panel.createButton("New Material")
         createTilemapButton = panel.createButton("New Tilemap")
         createEntityButton = panel.createButton("New Entity")
+        editTilemapButton = panel.createButton("Edit Tilemap")
+        editEntityButton = panel.createButton("Edit Entity")
         saveSceneButton = panel.createButton("Save Scene")
     }
 
@@ -48,27 +52,43 @@ class ToolsPanel(private val window: Window,
         panel.w = window.size.x.toFloat()
 
         if (createTilemapButton.clicked) {
-            tilemapProperties.show()
-            materialProperties.visible = false
-            newEntityDialog.visible = false
-            editEntityProperties.visible = false
-            tilemapEditorProperties.visible = false
+            newTilemapDialog.show()
+            materialProperties.hide()
+            newEntityDialog.hide()
+            tilemapEditorDialog.hide()
+            editEntityDialog.hide()
         }
 
         if (createMaterialButton.clicked) {
+            newTilemapDialog.hide()
             materialProperties.show()
-            tilemapProperties.visible = false
-            newEntityDialog.visible = false
-            editEntityProperties.visible = false
-            tilemapEditorProperties.visible = false
+            newEntityDialog.hide()
+            tilemapEditorDialog.hide()
+            editEntityDialog.hide()
         }
 
         if (createEntityButton.clicked) {
+            newTilemapDialog.hide()
+            materialProperties.hide()
             newEntityDialog.show()
-            materialProperties.visible = false
-            tilemapProperties.visible = false
-            editEntityProperties.visible = false
-            tilemapEditorProperties.visible = false
+            tilemapEditorDialog.hide()
+            editEntityDialog.hide()
+        }
+
+        if (editTilemapButton.clicked) {
+            newTilemapDialog.hide()
+            materialProperties.hide()
+            newEntityDialog.hide()
+            tilemapEditorDialog.show()
+            editEntityDialog.hide()
+        }
+
+        if (editEntityButton.clicked) {
+            newTilemapDialog.hide()
+            materialProperties.hide()
+            newEntityDialog.hide()
+            tilemapEditorDialog.hide()
+            editEntityDialog.show()
         }
 
         if (saveSceneButton.clicked) {

@@ -2,9 +2,10 @@ package spatter.tilemap
 
 import rain.api.Window
 import rain.api.gui.v2.*
+import spatter.EditorDialog
 import spatter.editorSkin
 
-class TilemapPropertiesPanel(private val window: Window) {
+class NewTilemapDialog(private val window: Window): EditorDialog {
     var numTileX = 0
         get() {
             field = widthTextField.string.toInt()
@@ -32,14 +33,6 @@ class TilemapPropertiesPanel(private val window: Window) {
 
     var created = false
         private set
-    var visible = false
-        get() {
-            return panel.visible
-        }
-        set(value) {
-            field = value
-            panel.visible = value
-        }
 
     private var layout: FillRowLayout = FillRowLayout()
     private var panel: Panel
@@ -85,9 +78,17 @@ class TilemapPropertiesPanel(private val window: Window) {
         }
     }
 
-    fun show() {
+    override fun shown(): Boolean {
+        return panel.visible
+    }
+
+    override fun show() {
         panel.x = window.size.x / 2.0f - panel.w / 2.0f
         panel.y = window.size.y / 2.0f - panel.h / 2.0f
         panel.visible = true
+    }
+
+    override fun hide() {
+        panel.visible = false
     }
 }
