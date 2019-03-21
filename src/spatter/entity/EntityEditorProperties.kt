@@ -21,7 +21,7 @@ class EntityEditorProperties(private val window: Window) {
     private var newMetadataEntryLabel: Label
     private var newMetadataEntryButton: Button
 
-    private var selectedEntity: ProjectEntity? = null
+    var selectedEntity: ProjectEntity? = null
     private var currentProjectEntities = ArrayList<ToggleButton>()
     private var currentActiveMetadata = ArrayList<TextField>()
 

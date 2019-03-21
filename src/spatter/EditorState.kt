@@ -13,7 +13,6 @@ import spatter.tilemap.TilemapPropertiesPanel
 
 class EditorState(private val window: Window, stateManager: StateManager): State(stateManager) {
     private lateinit var toolsPanel: ToolsPanel
-    private lateinit var resourcePanel: ResourcePanel
     private lateinit var materialPropertiesPanel: MaterialPropertiesPanel
     private lateinit var tilemapPropertiesPanel: TilemapPropertiesPanel
     private lateinit var tilemapEditor: TilemapEditor
@@ -25,19 +24,18 @@ class EditorState(private val window: Window, stateManager: StateManager): State
 
         tilemapPropertiesPanel = TilemapPropertiesPanel(window)
         materialPropertiesPanel = MaterialPropertiesPanel(window)
-        newEntityDialog = NewEntityDialog(window)
-        toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel, newEntityDialog)
-        tilemapEditor = TilemapEditor(resourceFactory, scene)
         entityEditor = EntityEditor(resourceFactory, scene)
-        resourcePanel = ResourcePanel(window)
+        newEntityDialog = NewEntityDialog(window)
+        toolsPanel = ToolsPanel(window, materialPropertiesPanel, tilemapPropertiesPanel, tilemapEditor.tilemapEditorProperties,
+            newEntityDialog, entityEditor.entityEditorProperties)
+        tilemapEditor = TilemapEditor(resourceFactory, scene)
     }
 
     override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input) {
-        tilemapPropertiesPanel.update()
         toolsPanel.update()
-        resourcePanel.update()
+        tilemapPropertiesPanel.update()
         materialPropertiesPanel.update()
-        newEntityDialog.update(currentProjectScene, resourcePanel)
+        newEntityDialog.update(currentProjectScene)
 
         tilemapEditor.update(input)
         entityEditor.update(input)

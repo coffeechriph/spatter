@@ -14,6 +14,14 @@ class MaterialPropertiesPanel(window: Window) {
     private val doneButton: Button
     private val fileChooseDialog: FileChooseDialog
     private var resourceSelectionType = 0
+    var visible = false
+        get() {
+            return panel.visible
+        }
+        set(value) {
+            field = value
+            panel.visible = false
+        }
 
     init {
         val layout = FillRowLayout()

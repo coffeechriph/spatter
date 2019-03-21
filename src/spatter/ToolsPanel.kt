@@ -2,7 +2,9 @@ package spatter
 
 import rain.api.Window
 import rain.api.gui.v2.*
+import spatter.entity.EntityEditorProperties
 import spatter.entity.NewEntityDialog
+import spatter.tilemap.TilemapEditorProperties
 import spatter.tilemap.TilemapPropertiesPanel
 import java.io.File
 
@@ -11,7 +13,9 @@ const val TOOLS_PANEL_HEIGHT = 34.0f
 class ToolsPanel(private val window: Window,
                  private val materialProperties: MaterialPropertiesPanel,
                  private val tilemapProperties: TilemapPropertiesPanel,
-                 private val newEntityDialog: NewEntityDialog
+                 private val tilemapEditorProperties: TilemapEditorProperties,
+                 private val newEntityDialog: NewEntityDialog,
+                 private val editEntityProperties: EntityEditorProperties
 ) {
     private val panelLayout: GridLayout
     private val panel: Panel
@@ -45,14 +49,26 @@ class ToolsPanel(private val window: Window,
 
         if (createTilemapButton.clicked) {
             tilemapProperties.show()
+            materialProperties.visible = false
+            newEntityDialog.visible = false
+            editEntityProperties.visible = false
+            tilemapEditorProperties.visible = false
         }
 
         if (createMaterialButton.clicked) {
             materialProperties.show()
+            tilemapProperties.visible = false
+            newEntityDialog.visible = false
+            editEntityProperties.visible = false
+            tilemapEditorProperties.visible = false
         }
 
         if (createEntityButton.clicked) {
             newEntityDialog.show()
+            materialProperties.visible = false
+            tilemapProperties.visible = false
+            editEntityProperties.visible = false
+            tilemapEditorProperties.visible = false
         }
 
         if (saveSceneButton.clicked) {

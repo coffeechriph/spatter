@@ -30,6 +30,17 @@ class TilemapPropertiesPanel(private val window: Window) {
         }
         private set
 
+    var created = false
+        private set
+    var visible = false
+        get() {
+            return panel.visible
+        }
+        set(value) {
+            field = value
+            panel.visible = value
+        }
+
     private var layout: FillRowLayout = FillRowLayout()
     private var panel: Panel
     private var widthLabel: Label
@@ -37,15 +48,11 @@ class TilemapPropertiesPanel(private val window: Window) {
     private var widthTextField: TextField
     private var heightTextField: TextField
 
-
     private var tileWidthLabel: Label
     private var tileHeightLabel: Label
     private var tileWidthTextField: TextField
     private var tileHeightTextField: TextField
     private val doneButton: Button
-
-    var created = false
-        private set
 
     init {
         layout.componentsPerRow = 1

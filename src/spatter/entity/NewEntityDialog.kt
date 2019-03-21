@@ -3,10 +3,17 @@ package spatter.entity
 import rain.api.Window
 import rain.api.gui.v2.*
 import spatter.ProjectScene
-import spatter.ResourcePanel
 import spatter.editorSkin
 
 class NewEntityDialog(private val window: Window) {
+    var visible = false
+        get() {
+            return panel.visible
+        }
+        set(value) {
+            field = value
+            panel.visible = value
+        }
     private val panelLayout = FillRowLayout()
     private val panel: Panel
     private val entityNameLabel: Label
@@ -31,7 +38,7 @@ class NewEntityDialog(private val window: Window) {
         doneButton = panel.createButton("Done")
     }
 
-    fun update(projectScene: ProjectScene, resourcePanel: ResourcePanel) {
+    fun update(projectScene: ProjectScene) {
         if (doneButton.clicked) {
             if (projectScene.entities.containsKey(entityNameField.string)) {
                 // TODO: Prompt error - every entity in each scene needs to be unique
@@ -40,7 +47,6 @@ class NewEntityDialog(private val window: Window) {
                 panel.visible = false
                 val entity = ProjectEntity("materialName", mutableListOf(), mutableListOf())
                 projectScene.entities[entityNameField.string] = entity
-                resourcePanel.recreateEntitiesList(projectScene)
             }
         }
     }
