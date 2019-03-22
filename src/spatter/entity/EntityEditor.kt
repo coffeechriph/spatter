@@ -1,24 +1,20 @@
 package spatter.entity
 
-import org.joml.Vector2f
 import rain.api.Input
 import rain.api.entity.Entity
 import rain.api.entity.EntitySystem
 import rain.api.gfx.*
+import rain.api.scene.Camera
 import rain.api.scene.Scene
 import spatter.EditMode
-import spatter.currentProjectScene
+import spatter.project.ProjectEntityInstance
+import spatter.project.currentProjectScene
 
 class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val entityEditorDialog: EntityEditorDialog) {
     var spriteTexture: Texture2d
-    private var entitySystem: EntitySystem<Entity>
-    private var entityQuad: VertexBuffer
-    private var editMode: EditMode = EditMode.MOVE
-    private var spriteMaterial: Material
-
-    private var beginMovePosition = false
-    private var movePosition = false
-    private var moveDiffStart = Vector2f(0.0f, 0.0f)
+    var entitySystem: EntitySystem<Entity>
+    var spriteMaterial: Material
+    var entityQuad: VertexBuffer
 
     init {
         spriteTexture = resourceFactory.buildTexture2d()
@@ -41,31 +37,30 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
             .as2dQuad()
     }
 
-    fun update(input: Input) {
+    fun update(input: Input, camera: Camera) {
         entityEditorDialog.update(currentProjectScene, spriteTexture)
         if (entityEditorDialog.visible) {
-            if (input.keyState(Input.Key.KEY_1) == Input.InputState.PRESSED) {
-                editMode = EditMode.MOVE
-            } else if (input.keyState(Input.Key.KEY_2) == Input.InputState.PRESSED) {
-                editMode = EditMode.EDIT
-            }
-
             if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
                 if (entityEditorDialog.selectedEntity != null) {
-                    entityEditorDialog.selectedEntity!!.instances.add(ProjectEntityInstance(
-                        input.mousePosition.x.toFloat(),
-                        input.mousePosition.y.toFloat(),
-                        1.0f,
-                        entityEditorDialog.selectedImageIndex.x,
-                        entityEditorDialog.selectedImageIndex.y,
-                        32.0f, 32.0f))
+                    val mx = input.mousePosition.x.toFloat() - camera.x
+                    val my = input.mousePosition.y.toFloat() - camera.y
+                    entityEditorDialog.selectedEntity!!.instances.add(
+                        ProjectEntityInstance(
+                            mx,
+                            my,
+                            1.0f,
+                            entityEditorDialog.selectedImageIndex.x,
+                            entityEditorDialog.selectedImageIndex.y,
+                            32.0f, 32.0f
+                        )
+                    )
 
                     val entity = Entity()
                     entitySystem.newEntity(entity)
                         .attachRenderComponent(spriteMaterial, Mesh(entityQuad, null))
                         .build()
-                    entity.transform.x = input.mousePosition.x.toFloat()
-                    entity.transform.y = input.mousePosition.y.toFloat()
+                    entity.transform.x = mx
+                    entity.transform.y = my
                     entity.transform.sx = 32.0f
                     entity.transform.sy = 32.0f
                     entity.transform.z = 1.0f

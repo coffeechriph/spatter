@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import rain.api.scene.TileGfx
+import rain.api.scene.TileGfxNone
 import rain.api.scene.Tilemap
-import spatter.SceneMetadata
+import spatter.project.SceneMetadata
 
 data class TileGroup @JsonCreator constructor(
     @JsonProperty("image_x")
@@ -19,12 +20,21 @@ data class TilemapLayer @JsonCreator constructor(
     @JsonProperty("tile_group")
     var tileGroup: MutableList<TileGroup>,
     @JsonProperty("metadata")
-    var metadata: MutableList<SceneMetadata>,
-    @JsonIgnore
-    var tileGfx: Array<TileGfx>,
-    @JsonIgnore
-    var tilemapRef: Tilemap
+    var metadata: MutableList<SceneMetadata>
 ) {
+    @JsonIgnore
+    var tileGfx: Array<TileGfx> = Array(0){ TileGfxNone }
+        @JsonIgnore
+        get() {
+            return field
+        }
+        @JsonIgnore
+        set(value) {
+            field = value
+        }
+    @JsonIgnore
+    var tilemapRef: Tilemap = Tilemap()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -56,7 +66,8 @@ data class TilemapData @JsonCreator constructor(
     @JsonProperty("tile_height")
     var tileHeight: Float,
     @JsonProperty("layers")
-    var layers: MutableList<TilemapLayer>,
+    var layers: MutableList<TilemapLayer>
+) {
     @JsonIgnore
-    var activeLayer: TilemapLayer
-)
+    lateinit var activeLayer: TilemapLayer
+}

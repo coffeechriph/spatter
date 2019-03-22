@@ -1,30 +1,27 @@
 package spatter.tilemap
 
-import org.joml.Vector2f
 import rain.api.Input
 import rain.api.gfx.Material
 import rain.api.gfx.ResourceFactory
 import rain.api.gfx.Texture2d
 import rain.api.gfx.TextureFilter
 import rain.api.gui.v2.guiManagerSetMaterial
+import rain.api.scene.Camera
 import rain.api.scene.Scene
 import rain.api.scene.TileGfx
 import rain.api.scene.Tilemap
 import spatter.EditMode
-import spatter.currentProjectScene
+import spatter.project.currentProjectScene
 import java.util.*
 import kotlin.collections.HashSet
 
 class TilemapEditor(private val resourceFactory: ResourceFactory, private val scene: Scene, private val tilemapEditorDialog: TilemapEditorDialog) {
     // TODO: Replace these with dynamic materials
     private var tilemapTexture: Texture2d
-    private var tilemapMaterial: Material
+    internal var tilemapMaterial: Material
     private val guiMaterial: Material
 
     private var selectedTilemapData: TilemapData? = null
-    private var beginMovePosition = false
-    private var movePosition = false
-    private var moveDiffStart = Vector2f(0.0f, 0.0f)
 
     init {
         tilemapTexture = resourceFactory.buildTexture2d()
@@ -68,7 +65,6 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             defaultTileGfx
         )
         tilemap.update(defaultTileGfx)
-        tilemap.transform.setPosition(100.0f, 24.0f, 1.0f)
         scene.addTilemap(tilemap)
 
         val defaultIndexSet = HashSet<Int>()
@@ -77,51 +73,31 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
         }
         val defaultGroup = TileGroup(0, 0, defaultIndexSet)
         val defaultLayer =
-            TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), defaultTileGfx, tilemap)
-        val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList(), defaultLayer)
+            TilemapLayer(mutableListOf(defaultGroup), mutableListOf())
+        defaultLayer.tileGfx = defaultTileGfx
+        defaultLayer.tilemapRef = tilemap
+
+        val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList())
+        tilemapData.activeLayer = defaultLayer
         tilemapData.layers.add(defaultLayer)
         currentProjectScene.mapData.add(tilemapData)
     }
 
-    fun update(input: Input) {
+    fun update(input: Input, camera: Camera) {
+        // TODO: Allow to specify which tilemap to edit
+        if (currentProjectScene.mapData.size > 0) {
+            selectedTilemapData = currentProjectScene.mapData[0]
+        }
+
         tilemapEditorDialog.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
         if (tilemapEditorDialog.shown()) {
-            if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
-                if (tilemapEditorDialog.selectedEditorMode == EditMode.MOVE) {
-                    selectTilemap(input.mousePosition.x, input.mousePosition.y)
-                    if (selectedTilemapData != null) {
-                        if (!movePosition && !beginMovePosition) {
-                            beginMovePosition = true
-                        }
-                    }
-                }
-            } else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN) {
-                if (beginMovePosition) {
-                    beginMovePosition = false
-                    movePosition = true
-
-                    for (layer in selectedTilemapData!!.layers) {
-                        moveDiffStart.x = input.mousePosition.x.toFloat() - layer.tilemapRef.transform.x
-                        moveDiffStart.y = input.mousePosition.y.toFloat() - layer.tilemapRef.transform.y
-                    }
-                }
-            } else if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.RELEASED) {
-                beginMovePosition = false
-                movePosition = false
-            }
-
-            if (movePosition && selectedTilemapData != null) {
-                for (layer in selectedTilemapData!!.layers) {
-                    layer.tilemapRef.transform.x = input.mousePosition.x.toFloat() - moveDiffStart.x
-                    layer.tilemapRef.transform.y = input.mousePosition.y.toFloat() - moveDiffStart.y
-                }
-            }
-
-            if (tilemapEditorDialog.selectedEditorMode == EditMode.EDIT) {
+            if (tilemapEditorDialog.selectedEditorMode == EditMode.ADD) {
                 if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
                     input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN
                 ) {
-                    editTilemap(input.mousePosition.x, input.mousePosition.y,
+                    val mx = input.mousePosition.x - camera.x
+                    val my = input.mousePosition.y - camera.y
+                    editTilemap(mx.toInt(), my.toInt(),
                         tilemapEditorDialog.selectedTileIndex.x,
                         tilemapEditorDialog.selectedTileIndex.y)
                 }
@@ -180,16 +156,5 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     private fun createNewTileGroupWithTile(tilemapLayer: TilemapLayer, imageX: Int, imageY: Int, tileIndex: Int) {
         val group = TileGroup(imageX, imageY, mutableSetOf(tileIndex))
         tilemapLayer.tileGroup.add(group)
-    }
-
-    private fun selectTilemap(x: Int, y: Int) {
-        for (tilemapData in currentProjectScene.mapData) {
-            val tilemap = tilemapData.activeLayer.tilemapRef
-            if (x >= tilemap.transform.x && x <= tilemap.transform.x + tilemap.tileNumX * tilemap.tileWidth &&
-                y >= tilemap.transform.y && y <= tilemap.transform.y + tilemap.tileNumY * tilemap.tileHeight) {
-                selectedTilemapData = tilemapData
-                break
-            }
-        }
     }
 }

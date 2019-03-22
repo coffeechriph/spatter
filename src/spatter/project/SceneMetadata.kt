@@ -1,4 +1,4 @@
-package spatter
+package spatter.project
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

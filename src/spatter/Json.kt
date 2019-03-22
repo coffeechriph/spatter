@@ -1,6 +1,7 @@
 package spatter
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import spatter.project.ProjectScene
 
 private var mapper = jacksonObjectMapper()
 

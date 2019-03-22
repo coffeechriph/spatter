@@ -4,12 +4,12 @@ import org.joml.Vector2i
 import rain.api.Window
 import rain.api.gfx.Material
 import rain.api.gfx.ResourceFactory
-import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
 import rain.api.scene.Scene
 import rain.api.scene.TileGfxNone
 import rain.api.scene.Tilemap
 import spatter.*
+import spatter.project.SceneMetadata
 
 class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var layout: GridLayout = GridLayout()
@@ -19,7 +19,6 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var metadataPanel: Panel
 
     private var tileEditorToolPanel: Panel
-    private var tileEditorMoveButton: ToggleButton
     private val tileEditorEditButton: ToggleButton
     private val tileEditorRemoveButton: ToggleButton
 
@@ -37,7 +36,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
 
     var selectedTileIndex: Vector2i = Vector2i(0,0)
         private set
-    var selectedEditorMode: EditMode = EditMode.MOVE
+    var selectedEditorMode: EditMode = EditMode.ADD
         private set
 
     private val images = ArrayList<Image>()
@@ -54,9 +53,8 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
         tileEditorToolPanel.skin = editorSkin
         tileEditorToolPanel.visible = false
 
-        tileEditorMoveButton = tileEditorToolPanel.createToggleButton("Move")
-        tileEditorMoveButton.checked = true
         tileEditorEditButton = tileEditorToolPanel.createToggleButton("Edit")
+        tileEditorEditButton.checked = true
         tileEditorRemoveButton = tileEditorToolPanel.createToggleButton("Remove")
 
         layout.gridW = 50.0f
@@ -110,18 +108,11 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
         metadataPanel.x = window.size.x - metadataPanel.w
         metadataPanel.y = tileSelectorPanel.y + tileSelectorPanel.h
 
-        if (tileEditorMoveButton.clicked) {
-            tileEditorEditButton.checked = false
+        if (tileEditorEditButton.clicked){
             tileEditorRemoveButton.checked = false
-            selectedEditorMode = EditMode.MOVE
-        }
-        else if (tileEditorEditButton.clicked){
-            tileEditorMoveButton.checked = false
-            tileEditorRemoveButton.checked = false
-            selectedEditorMode = EditMode.EDIT
+            selectedEditorMode = EditMode.ADD
         }
         else if (tileEditorRemoveButton.clicked){
-            tileEditorMoveButton.checked = false
             tileEditorEditButton.checked = false
             selectedEditorMode = EditMode.REMOVE
         }
@@ -204,12 +195,12 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
                     tileGfx
                 )
                 scene.addTilemap(tilemap)
-                tilemap.transform.x = selectedTilemapData.activeLayer.tilemapRef.transform.x
-                tilemap.transform.y = selectedTilemapData.activeLayer.tilemapRef.transform.y
                 tilemap.transform.z = selectedTilemapData.activeLayer.tilemapRef.transform.z + 1.0f
 
                 val newLayer =
-                    TilemapLayer(mutableListOf(), mutableListOf(), tileGfx, tilemap)
+                    TilemapLayer(mutableListOf(), mutableListOf())
+                newLayer.tileGfx = tileGfx
+                newLayer.tilemapRef = tilemap
                 selectedTilemapData.layers.add(newLayer)
 
                 val button = tileLayerPanel.createToggleButton("Layer:${currentActiveLayers.size}")

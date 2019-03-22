@@ -6,6 +6,10 @@ import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
 import rain.assertion
 import spatter.*
+import spatter.project.ProjectEntity
+import spatter.project.ProjectScene
+import spatter.project.SceneMetadata
+import spatter.project.currentProjectScene
 
 class EntityEditorDialog(private val window: Window): EditorDialog {
     private var layout: GridLayout = GridLayout()
@@ -170,6 +174,10 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         for (entity in projectScene.entities) {
             val button = entityTypePanel.createToggleButton(entity.key)
             currentProjectEntities.add(button)
+
+            if (selectedEntity == entity.value) {
+                button.checked = true
+            }
         }
     }
 
@@ -198,6 +206,10 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
     }
 
     override fun show() {
+        if (selectedEntity == null && currentProjectScene.entities.isNotEmpty()) {
+            selectedEntity = currentProjectScene.entities.values.first()
+        }
+
         updateImageSelector = true
         imageSelectorPanel.visible = true
         entityTypePanel.visible = true

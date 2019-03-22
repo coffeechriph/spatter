@@ -4,6 +4,7 @@ import rain.api.Window
 import rain.api.gui.v2.*
 import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
+import spatter.project.currentProjectScene
 import spatter.tilemap.TilemapEditorDialog
 import spatter.tilemap.NewTilemapDialog
 import java.io.File
@@ -15,7 +16,8 @@ class ToolsPanel(private val window: Window,
                  private val newTilemapDialog: NewTilemapDialog,
                  private val tilemapEditorDialog: TilemapEditorDialog,
                  private val newEntityDialog: NewEntityDialog,
-                 private val editEntityDialog: EntityEditorDialog
+                 private val editEntityDialog: EntityEditorDialog,
+                 private val loadSceneDialog: FileChooseDialog
 ) {
     private val panelLayout: GridLayout
     private val panel: Panel
@@ -25,6 +27,7 @@ class ToolsPanel(private val window: Window,
     private val editTilemapButton: Button
     private val editEntityButton: Button
     private val saveSceneButton: Button
+    private val loadSceneButton: Button
 
     init {
         panelLayout = GridLayout()
@@ -46,6 +49,7 @@ class ToolsPanel(private val window: Window,
         editTilemapButton = panel.createButton("Edit Tilemap")
         editEntityButton = panel.createButton("Edit Entity")
         saveSceneButton = panel.createButton("Save Scene")
+        loadSceneButton = panel.createButton("Load Scene")
     }
 
     fun update() {
@@ -89,6 +93,15 @@ class ToolsPanel(private val window: Window,
             newEntityDialog.hide()
             tilemapEditorDialog.hide()
             editEntityDialog.show()
+        }
+
+        if (loadSceneButton.clicked) {
+            newTilemapDialog.hide()
+            materialProperties.hide()
+            newEntityDialog.hide()
+            tilemapEditorDialog.hide()
+            editEntityDialog.hide()
+            loadSceneDialog.show("./projects/project1/scenes")
         }
 
         if (saveSceneButton.clicked) {

@@ -1,8 +1,7 @@
-package spatter.entity
+package spatter.project
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import spatter.SceneMetadata
 
 data class ProjectEntityInstance @JsonCreator constructor(
     @JsonProperty("pos_x")
