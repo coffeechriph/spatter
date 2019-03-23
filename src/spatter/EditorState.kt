@@ -1,5 +1,6 @@
 package spatter
 
+import kotlinx.serialization.json.Json
 import org.joml.Vector2i
 import rain.State
 import rain.StateManager
@@ -31,6 +32,7 @@ class EditorState(private val window: Window, stateManager: StateManager): State
     private lateinit var newEntityDialog: NewEntityDialog
     private lateinit var entityEditorDialog: EntityEditorDialog
     private lateinit var loadSceneDialog: FileChooseDialog
+    private lateinit var exportSceneDialog: ExportSceneDialog
 
     private lateinit var activeCamera: Camera
     private var doCameraMove = false
@@ -45,11 +47,12 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         newEntityDialog = NewEntityDialog(window)
         entityEditorDialog = EntityEditorDialog(window)
         loadSceneDialog = FileChooseDialog(window)
+        exportSceneDialog = ExportSceneDialog(window)
 
         entityEditor = EntityEditor(resourceFactory, scene, entityEditorDialog)
         tilemapEditor = TilemapEditor(resourceFactory, scene, tilemapEditorDialog)
         toolsPanel = ToolsPanel(window, materialPropertiesDialog, newTilemapDialog, tilemapEditorDialog,
-            newEntityDialog, entityEditorDialog, loadSceneDialog)
+            newEntityDialog, entityEditorDialog, loadSceneDialog, exportSceneDialog)
 
         activeCamera = scene.activeCamera
     }
@@ -59,6 +62,7 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         newTilemapDialog.update()
         materialPropertiesDialog.update()
         newEntityDialog.update(currentProjectScene)
+        exportSceneDialog.update()
 
         tilemapEditor.update(input, scene.activeCamera)
         entityEditor.update(input, scene.activeCamera)
@@ -78,23 +82,20 @@ class EditorState(private val window: Window, stateManager: StateManager): State
 
         if (loadSceneDialog.hasSelected) {
             val content = File("./projects/project1/scenes/" + loadSceneDialog.lastSelectedItem!!.string).readText(StandardCharsets.UTF_8)
-            currentProjectScene = jsonSceneReader.forType(ProjectScene::class.java).readValue(content)
+            currentProjectScene = Json.parse(ProjectScene.serializer(), content)
             for (data in currentProjectScene.mapData) {
                 var depth = 0.0f
                 for (layer in data.layers) {
-                    val tilemap = Tilemap()
-                    val tileGfx = Array(data.tileNumX*data.tileNumY){ TileGfxNone }
+                    val tilemap = scene.createTilemap(tilemapEditor.tilemapMaterial, data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight)
                     for (group in layer.tileGroup) {
                         for (index in group.tileIndicesIntoMap) {
-                            tileGfx[index] = TileGfx(group.imageX, group.imageY)
+                            tilemap.setTile(index%data.tileNumX, index/data.tileNumY, group.imageX, group.imageY, 1.0f, 1.0f, 1.0f, 1.0f)
                         }
                     }
-                    tilemap.create(resourceFactory, tilemapEditor.tilemapMaterial, data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight, tileGfx)
 
                     // TODO: This can cause trouble if the layers don't appear in order
                     // We should save the depth of the layer as well
                     tilemap.transform.z = depth
-                    scene.addTilemap(tilemap)
                     layer.tilemapRef = tilemap
 
                     depth += 1.0f

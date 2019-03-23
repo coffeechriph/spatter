@@ -1,10 +1,11 @@
 package spatter.project
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class SceneMetadata @JsonCreator constructor(
-    @JsonProperty("name")
+@Serializable
+data class SceneMetadata constructor(
+    @SerialName("name")
     var name: String,
-    @JsonProperty("value")
+    @SerialName("value")
     var value: String)

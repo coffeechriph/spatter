@@ -1,13 +1,13 @@
 package spatter.project
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonProperty
-import spatter.tilemap.TilemapData
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class ProjectScene @JsonCreator constructor(
-    @JsonProperty("map")
+@Serializable
+class ProjectScene constructor(
+    @SerialName("map")
     val mapData: MutableList<TilemapData>,
-    @JsonProperty("entities")
+    @SerialName("entities")
     val entities: MutableMap<String, ProjectEntity>)
 
 var currentProjectScene = ProjectScene(mutableListOf(), mutableMapOf())

@@ -8,9 +8,10 @@ import rain.api.gfx.TextureFilter
 import rain.api.gui.v2.guiManagerSetMaterial
 import rain.api.scene.Camera
 import rain.api.scene.Scene
-import rain.api.scene.TileGfx
-import rain.api.scene.Tilemap
 import spatter.EditMode
+import spatter.project.TileGroup
+import spatter.project.TilemapData
+import spatter.project.TilemapLayer
 import spatter.project.currentProjectScene
 import java.util.*
 import kotlin.collections.HashSet
@@ -50,22 +51,17 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     }
 
     fun createTilemap(numTileX: Int, numTileY: Int, tileW: Float, tileH: Float) {
-        val defaultTileGfx = Array(numTileX * numTileY) {
-            TileGfx(0, 0)
+        val tilemap = scene.createTilemap(tilemapMaterial, numTileX, numTileY, tileW, tileH)
+        var x = 0
+        var y = 0
+        for (i in 0 until numTileX*numTileY) {
+            tilemap.setTile(x, y, 0, 0, 1.0f, 1.0f, 1.0f, 1.0f)
+            x += 1
+            if (x >= numTileX) {
+                x = 0
+                y += 1
+            }
         }
-
-        val tilemap = Tilemap()
-        tilemap.create (
-            resourceFactory,
-            tilemapMaterial,
-            numTileX,
-            numTileY,
-            tileW,
-            tileH,
-            defaultTileGfx
-        )
-        tilemap.update(defaultTileGfx)
-        scene.addTilemap(tilemap)
 
         val defaultIndexSet = HashSet<Int>()
         for (i in 0 until numTileX * numTileY) {
@@ -74,7 +70,6 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
         val defaultGroup = TileGroup(0, 0, defaultIndexSet)
         val defaultLayer =
             TilemapLayer(mutableListOf(defaultGroup), mutableListOf())
-        defaultLayer.tileGfx = defaultTileGfx
         defaultLayer.tilemapRef = tilemap
 
         val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList())
@@ -95,9 +90,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
                 if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
                     input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.DOWN
                 ) {
-                    val mx = input.mousePosition.x - camera.x
-                    val my = input.mousePosition.y - camera.y
-                    editTilemap(mx.toInt(), my.toInt(),
+                    editTilemap(input.mousePosition.x, input.mousePosition.y,
                         tilemapEditorDialog.selectedTileIndex.x,
                         tilemapEditorDialog.selectedTileIndex.y)
                 }
@@ -115,8 +108,8 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     private fun editTilemap(x: Int, y: Int, imageX: Int, imageY: Int) {
         if (selectedTilemapData != null) {
             val activeTilemapLayer = selectedTilemapData!!.activeLayer.tilemapRef
-            val tx = ((x - activeTilemapLayer.transform.x) / activeTilemapLayer.tileWidth).toInt()
-            val ty = ((y - activeTilemapLayer.transform.y) / activeTilemapLayer.tileHeight).toInt()
+            val tx = ((x - activeTilemapLayer.transform.x - scene.activeCamera.x) / activeTilemapLayer.tileWidth).toInt()
+            val ty = ((y - activeTilemapLayer.transform.y - scene.activeCamera.y) / activeTilemapLayer.tileHeight).toInt()
 
             if (tx >= 0 && tx < activeTilemapLayer.tileNumX &&
                 ty >= 0 && ty < activeTilemapLayer.tileNumY) {
@@ -135,8 +128,12 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
                         { createNewTileGroupWithTile(activeLayer, imageX, imageY, tileIndex) })
                 }
 
-                selectedTilemapData!!.activeLayer.tileGfx[tileIndex] = TileGfx(imageX, imageY)
-                activeTilemapLayer.update(selectedTilemapData!!.activeLayer.tileGfx)
+                if(tilemapEditorDialog.selectedEditorMode == EditMode.ADD) {
+                    activeTilemapLayer.setTile(tx, ty, imageX, imageY)
+                }
+                else {
+                    activeTilemapLayer.removeTile(tx, ty)
+                }
             }
         }
     }

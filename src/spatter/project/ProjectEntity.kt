@@ -1,24 +1,27 @@
 package spatter.project
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class ProjectEntityInstance @JsonCreator constructor(
-    @JsonProperty("pos_x")
+@Serializable
+data class ProjectEntityInstance constructor(
+    @SerialName("pos_x")
     var posX: Float,
-    @JsonProperty("pos_y")
+    @SerialName("pos_y")
     var posY: Float,
-    @JsonProperty("pos_z")
+    @SerialName("pos_z")
     var posZ: Float,
-    @JsonProperty("image_x")
+    @SerialName("image_x")
     var imageX: Int,
-    @JsonProperty("image_y")
+    @SerialName("image_y")
     var imageY: Int,
     var width: Float,
     var height: Float
 )
 
-data class ProjectEntity @JsonCreator constructor(
+@Serializable
+data class ProjectEntity constructor(
+    @SerialName("material")
     var materialName: String,
     val metadata: MutableList<SceneMetadata>,
     val instances: MutableList<ProjectEntityInstance>)

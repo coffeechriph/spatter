@@ -6,10 +6,10 @@ import rain.api.gfx.Material
 import rain.api.gfx.ResourceFactory
 import rain.api.gui.v2.*
 import rain.api.scene.Scene
-import rain.api.scene.TileGfxNone
-import rain.api.scene.Tilemap
 import spatter.*
 import spatter.project.SceneMetadata
+import spatter.project.TilemapData
+import spatter.project.TilemapLayer
 
 class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var layout: GridLayout = GridLayout()
@@ -161,45 +161,56 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
                     }
 
                     // Tint the inactive layer
-                    for (tile in selectedTilemapData.activeLayer.tileGfx) {
-                        tile.red = 0.75f
-                        tile.green = 0.75f
-                        tile.blue = 0.75f
+                    for (k in 0 until selectedTilemapData.tileNumY*selectedTilemapData.tileNumX) {
+                        val tileX = k % selectedTilemapData.tileNumX
+                        val tileY = k / selectedTilemapData.tileNumX
+                        val imageIndices = selectedTilemapData.activeLayer.tilemapRef.getTileImageIndex(tileX, tileY)
+                        selectedTilemapData.activeLayer.tilemapRef.setTile(
+                            tileX,
+                            tileY,
+                            imageIndices.first,
+                            imageIndices.second,
+                            0.75f,
+                            0.75f,
+                            0.75f,
+                            1.0f
+                        )
                     }
-                    selectedTilemapData.activeLayer.tilemapRef.update(selectedTilemapData.activeLayer.tileGfx)
 
                     selectedTilemapData.activeLayer = selectedTilemapData.layers[i]
                     populateMetadataButtons(selectedTilemapData)
 
                     // Remove potential tint from active
-                    for (tile in selectedTilemapData.activeLayer.tileGfx) {
-                        tile.red = 1.0f
-                        tile.green = 1.0f
-                        tile.blue = 1.0f
+                    for (k in 0 until selectedTilemapData.tileNumY*selectedTilemapData.tileNumX) {
+                        val tileX = k % selectedTilemapData.tileNumX
+                        val tileY = k / selectedTilemapData.tileNumX
+                        val imageIndices = selectedTilemapData.activeLayer.tilemapRef.getTileImageIndex(tileX, tileY)
+                        selectedTilemapData.activeLayer.tilemapRef.setTile(
+                            tileX,
+                            tileY,
+                            imageIndices.first,
+                            imageIndices.second,
+                            1.0f,
+                            1.0f,
+                            1.0f,
+                            1.0f
+                        )
                     }
-                    selectedTilemapData.activeLayer.tilemapRef.update(selectedTilemapData.activeLayer.tileGfx)
                     break
                 }
             }
 
             if (createTileLayerButton.clicked) {
-                val tileGfx = Array(selectedTilemapData.tileNumX*selectedTilemapData.tileNumY){ TileGfxNone }
-                val tilemap = Tilemap()
-                tilemap.create(
-                    resourceFactory,
+                val tilemap = scene.createTilemap(
                     tileMaterial,
                     selectedTilemapData.tileNumX,
                     selectedTilemapData.tileNumY,
                     selectedTilemapData.tileWidth,
-                    selectedTilemapData.tileHeight,
-                    tileGfx
-                )
-                scene.addTilemap(tilemap)
+                    selectedTilemapData.tileHeight)
+
                 tilemap.transform.z = selectedTilemapData.activeLayer.tilemapRef.transform.z + 1.0f
 
-                val newLayer =
-                    TilemapLayer(mutableListOf(), mutableListOf())
-                newLayer.tileGfx = tileGfx
+                val newLayer = TilemapLayer(mutableListOf(), mutableListOf())
                 newLayer.tilemapRef = tilemap
                 selectedTilemapData.layers.add(newLayer)
 

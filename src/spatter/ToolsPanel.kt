@@ -1,9 +1,11 @@
 package spatter
 
+import kotlinx.serialization.json.Json
 import rain.api.Window
 import rain.api.gui.v2.*
 import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
+import spatter.project.ProjectScene
 import spatter.project.currentProjectScene
 import spatter.tilemap.TilemapEditorDialog
 import spatter.tilemap.NewTilemapDialog
@@ -17,7 +19,8 @@ class ToolsPanel(private val window: Window,
                  private val tilemapEditorDialog: TilemapEditorDialog,
                  private val newEntityDialog: NewEntityDialog,
                  private val editEntityDialog: EntityEditorDialog,
-                 private val loadSceneDialog: FileChooseDialog
+                 private val loadSceneDialog: FileChooseDialog,
+                 private val exportSceneDialog: ExportSceneDialog
 ) {
     private val panelLayout: GridLayout
     private val panel: Panel
@@ -32,7 +35,7 @@ class ToolsPanel(private val window: Window,
     init {
         panelLayout = GridLayout()
         panelLayout.gridW = 100.0f
-        panelLayout.gridH = 24.0f
+        panelLayout.gridH = 34.0f
 
         panel = guiManagerCreatePanel(panelLayout)
         panel.skin = editorSkin
@@ -105,15 +108,12 @@ class ToolsPanel(private val window: Window,
         }
 
         if (saveSceneButton.clicked) {
-            val json = jsonSceneWriter.writeValueAsString(currentProjectScene)
-
-            // TODO: We want to specify actual project directories
-            if (!File("projects").exists()) {
-                File("projects").mkdir()
-                File("projects/project1").mkdir()
-                File("projects/project1/scenes").mkdir()
-            }
-            File("projects/project1/scenes/scene.json").writeText(json)
+            exportSceneDialog.show()
+            newTilemapDialog.hide()
+            materialProperties.hide()
+            newEntityDialog.hide()
+            tilemapEditorDialog.hide()
+            editEntityDialog.hide()
         }
     }
 }
