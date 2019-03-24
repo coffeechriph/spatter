@@ -18,6 +18,7 @@ class ExportSceneDialog(window: Window): EditorDialog {
         panel.moveable = false
         panel.resizable = false
         panel.visible = false
+        panel.skin = editorSkin
 
         fileNameField = panel.createTextField("EnterFileName")
         exportButton = panel.createButton("Export")

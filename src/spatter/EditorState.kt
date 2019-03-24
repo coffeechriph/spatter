@@ -118,8 +118,16 @@ class EditorState(private val window: Window, stateManager: StateManager): State
                 for (instance in entity.value.definitionInstances) {
                     val entityInstance = Entity()
                     entityEditor.entitySystem.newEntity(entityInstance)
-                        .attachRenderComponent(entityEditor.spriteMaterial, Mesh(entityEditor.entityQuad, null))
+                        .attachRenderComponent(entityEditor.spriteMaterial, entityEditor.entityMesh)
                         .build()
+
+                    entityInstance.transform.x = instance.posX
+                    entityInstance.transform.y = instance.posY
+                    entityInstance.transform.z = instance.posZ
+                    entityInstance.transform.sx = instance.width
+                    entityInstance.transform.sy = instance.height
+                    entityInstance.getRenderComponents()[0].textureTileOffset.x = instance.imageX
+                    entityInstance.getRenderComponents()[0].textureTileOffset.y = instance.imageY
 
                     val newE = ProjectEntityInstance(instance.posX, instance.posY, instance.posZ, instance.imageX, instance.imageY, instance.width, instance.height, entityInstance)
                     instances.add(newE)
@@ -128,22 +136,6 @@ class EditorState(private val window: Window, stateManager: StateManager): State
                 entities[entity.key] = ProjectEntity(entity.value.material, entity.value.metadata, instances)
             }
             currentProjectScene = ProjectScene(sceneMap, entities)
-        }
-
-        for (projectEntity in currentProjectScene.entities) {
-            for (instance in projectEntity.value.instances) {
-                val entity = Entity()
-                entityEditor.entitySystem.newEntity(entity)
-                    .attachRenderComponent(entityEditor.spriteMaterial, Mesh(entityEditor.entityQuad, null))
-                    .build()
-                entity.transform.x = instance.posX
-                entity.transform.y = instance.posY
-                entity.transform.z = instance.posZ
-                entity.transform.sx = instance.width
-                entity.transform.sy = instance.height
-                entity.getRenderComponents()[0].textureTileOffset.x = instance.imageX
-                entity.getRenderComponents()[0].textureTileOffset.y = instance.imageY
-            }
         }
 
         loadSceneDialog.update()

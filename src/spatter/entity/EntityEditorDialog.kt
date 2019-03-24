@@ -18,8 +18,12 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
     private var entityTypeLayout = FillRowLayout()
     private var imageSelectorPanel: Panel
     private var entityTypePanel: Panel
+    private var entityPropertiesPanel: Panel
+    private var entityWidthLabel: Label
+    private var entityHeightLabel: Label
+    private val entityWidthField: TextField
+    private val entityHeightField: TextField
     private var metadataPanel: Panel
-
     private var metadataLayout = FillRowLayout()
     private var newMetadataEntryLabel: Label
     private var newMetadataEntryButton: Button
@@ -42,9 +46,11 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         layout.gridW = 50.0f
         layout.gridH = 50.0f
 
+        val panelHeight = (window.size.y - TOOLS_PANEL_HEIGHT) / 4.0f
+
         imageSelectorPanel = guiManagerCreatePanel(layout)
         imageSelectorPanel.w = 300.0f
-        imageSelectorPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
+        imageSelectorPanel.h = panelHeight
         imageSelectorPanel.skin = editorSkin
         imageSelectorPanel.visible = false
         imageSelectorPanel.moveable = false
@@ -54,17 +60,31 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         entityTypeLayout.componentHeight = 20.0f
         entityTypePanel = guiManagerCreatePanel(entityTypeLayout)
         entityTypePanel.w = 300.0f
-        entityTypePanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
+        entityTypePanel.h = panelHeight
         entityTypePanel.skin = editorSkin
         entityTypePanel.visible = false
         entityTypePanel.moveable = false
         entityTypePanel.resizable = false
 
+        entityPropertiesPanel = guiManagerCreatePanel(entityTypeLayout)
+        entityPropertiesPanel.w = 300.0f
+        entityPropertiesPanel.h = panelHeight
+        entityPropertiesPanel.skin = editorSkin
+        entityPropertiesPanel.visible = false
+        entityPropertiesPanel.moveable = false
+        entityPropertiesPanel.resizable = false
+
+        entityWidthLabel = entityPropertiesPanel.createLabel("Width")
+        entityWidthField = entityPropertiesPanel.createTextField("32")
+
+        entityHeightLabel = entityPropertiesPanel.createLabel("Height")
+        entityHeightField = entityPropertiesPanel.createTextField("32")
+
         metadataLayout.componentsPerRow = 2
         metadataLayout.componentHeight = 24.0f
         metadataPanel = guiManagerCreatePanel(metadataLayout)
         metadataPanel.w = 300.0f
-        metadataPanel.h = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f
+        metadataPanel.h = panelHeight
         metadataPanel.skin = editorSkin
         metadataPanel.resizable = false
         metadataPanel.moveable = false
@@ -73,12 +93,23 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
+    fun entityWidth(): Float {
+        return entityWidthField.string.toFloat()
+    }
+
+    fun entityHeight(): Float {
+        return entityHeightField.string.toFloat()
+    }
+
     fun update(projectScene: ProjectScene, selectedTilemapTexture: Texture2d) {
         entityTypePanel.x = window.size.x - entityTypePanel.w
         entityTypePanel.y = TOOLS_PANEL_HEIGHT
 
+        entityPropertiesPanel.x = window.size.x - entityPropertiesPanel.w
+        entityPropertiesPanel.y = entityTypePanel.y + entityTypePanel.h
+
         imageSelectorPanel.x = window.size.x - imageSelectorPanel.w
-        imageSelectorPanel.y = entityTypePanel.y + entityTypePanel.h
+        imageSelectorPanel.y = entityPropertiesPanel.y + entityPropertiesPanel.h
 
         metadataPanel.x = window.size.x - metadataPanel.w
         metadataPanel.y = imageSelectorPanel.y + imageSelectorPanel.h
@@ -112,6 +143,18 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
             imageSelectorPanel.y = entityTypePanel.y
             metadataPanel.x = entityTypePanel.x - metadataPanel.w
             metadataPanel.y = entityTypePanel.y
+        }
+
+        if (entityWidthField.textEdited) {
+            if (entityWidthField.string.contains(Regex("[^0-9]"))) {
+                entityWidthField.string = entityWidthField.string.replace(Regex("[^0-9]"), "")
+            }
+        }
+
+        if (entityHeightField.textEdited) {
+            if (entityHeightField.string.contains(Regex("[^0-9]"))) {
+                entityHeightField.string = entityHeightField.string.replace(Regex("[^0-9]"), "")
+            }
         }
 
         // Select a new entity
@@ -205,6 +248,7 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         imageSelectorPanel.visible = false
         entityTypePanel.visible = false
         metadataPanel.visible = false
+        entityPropertiesPanel.visible = false
     }
 
     override fun show() {
@@ -216,5 +260,6 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         imageSelectorPanel.visible = true
         entityTypePanel.visible = true
         metadataPanel.visible = true
+        entityPropertiesPanel.visible = true
     }
 }

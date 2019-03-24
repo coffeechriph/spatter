@@ -14,6 +14,7 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
     var entitySystem: EntitySystem<Entity>
     var spriteMaterial: Material
     var entityQuad: VertexBuffer
+    var entityMesh: Mesh
 
     init {
         spriteTexture = resourceFactory.buildTexture2d()
@@ -34,6 +35,8 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
         entitySystem = scene.newSystem(spriteMaterial)
         entityQuad = resourceFactory.buildVertexBuffer()
             .as2dQuad()
+
+        entityMesh = Mesh(entityQuad, null)
     }
 
     fun update(input: Input, camera: Camera) {
@@ -46,12 +49,12 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
 
                     val entity = Entity()
                     entitySystem.newEntity(entity)
-                        .attachRenderComponent(spriteMaterial, Mesh(entityQuad, null))
+                        .attachRenderComponent(spriteMaterial, entityMesh)
                         .build()
                     entity.transform.x = mx
                     entity.transform.y = my
-                    entity.transform.sx = 32.0f
-                    entity.transform.sy = 32.0f
+                    entity.transform.sx = entityEditorDialog.entityWidth()
+                    entity.transform.sy = entityEditorDialog.entityHeight()
                     entity.transform.z = 1.0f
                     entity.getRenderComponents()[0].textureTileOffset.x = entityEditorDialog.selectedImageIndex.x
                     entity.getRenderComponents()[0].textureTileOffset.y = entityEditorDialog.selectedImageIndex.y

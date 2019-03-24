@@ -14,6 +14,6 @@ class Entry: Rain() {
 
 fun main(args: Array<String>) {
     val app = Entry()
-    app.create(1600, 900, "Spatter", Api.VULKAN)
+    app.create(2560, 1440, "Spatter", Api.VULKAN)
     app.run()
 }
