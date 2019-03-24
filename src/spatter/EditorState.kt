@@ -9,14 +9,17 @@ import rain.api.Window
 import rain.api.entity.Entity
 import rain.api.gfx.Mesh
 import rain.api.gfx.ResourceFactory
-import rain.api.scene.*
+import rain.api.scene.Camera
+import rain.api.scene.Scene
+import rain.api.scene.parse.JsonSceneLoader
+import rain.api.scene.parse.SceneDefinition
+import rain.api.scene.parse.SceneMetadata
 import spatter.entity.EntityEditor
 import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
-import spatter.project.ProjectScene
-import spatter.project.currentProjectScene
-import spatter.tilemap.TilemapEditor
+import spatter.project.*
 import spatter.tilemap.NewTilemapDialog
+import spatter.tilemap.TilemapEditor
 import spatter.tilemap.TilemapEditorDialog
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -81,30 +84,50 @@ class EditorState(private val window: Window, stateManager: StateManager): State
         }
 
         if (loadSceneDialog.hasSelected) {
-            val content = File("./projects/project1/scenes/" + loadSceneDialog.lastSelectedItem!!.string).readText(StandardCharsets.UTF_8)
-            currentProjectScene = Json.parse(ProjectScene.serializer(), content)
-            for (data in currentProjectScene.mapData) {
+            val loadedScene = JsonSceneLoader().load("./projects/project1/scenes/" + loadSceneDialog.lastSelectedItem!!.string)
+            val sceneMap = ArrayList<TilemapData>()
+            for (data in loadedScene.map) {
                 var depth = 0.0f
+                val tileLayers = ArrayList<TilemapLayer>()
                 for (layer in data.layers) {
+                    val tileGroupList = ArrayList<TileGroup>()
                     val tilemap = scene.createTilemap(tilemapEditor.tilemapMaterial, data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight)
-                    for (group in layer.tileGroup) {
+                    for (group in layer.mapLayerTileGroup) {
+                        val tileGroupIndices = HashSet<Int>()
                         for (index in group.tileIndicesIntoMap) {
-                            tilemap.setTile(index%data.tileNumX, index/data.tileNumY, group.imageX, group.imageY, 1.0f, 1.0f, 1.0f, 1.0f)
+                            tilemap.setTile(index%data.tileNumX, index/data.tileNumX, group.imageX, group.imageY, 1.0f, 1.0f, 1.0f, 1.0f)
+                            tileGroupIndices.add(index)
                         }
+                        tileGroupList.add(TileGroup(group.imageX, group.imageY, tileGroupIndices))
                     }
 
                     // TODO: This can cause trouble if the layers don't appear in order
                     // We should save the depth of the layer as well
                     tilemap.transform.z = depth
-                    layer.tilemapRef = tilemap
+                    tileLayers.add(TilemapLayer(tileGroupList, layer.metadata, tilemap))
 
                     depth += 1.0f
                 }
 
-                if (data.layers.size > 0) {
-                    data.activeLayer = data.layers[0]
-                }
+                sceneMap.add(TilemapData(data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight, tileLayers, tileLayers[0]))
             }
+
+            val entities = HashMap<String, ProjectEntity>()
+            for (entity in loadedScene.entities) {
+                val instances = ArrayList<ProjectEntityInstance>()
+                for (instance in entity.value.definitionInstances) {
+                    val entityInstance = Entity()
+                    entityEditor.entitySystem.newEntity(entityInstance)
+                        .attachRenderComponent(entityEditor.spriteMaterial, Mesh(entityEditor.entityQuad, null))
+                        .build()
+
+                    val newE = ProjectEntityInstance(instance.posX, instance.posY, instance.posZ, instance.imageX, instance.imageY, instance.width, instance.height, entityInstance)
+                    instances.add(newE)
+                }
+
+                entities[entity.key] = ProjectEntity(entity.value.material, entity.value.metadata, instances)
+            }
+            currentProjectScene = ProjectScene(sceneMap, entities)
         }
 
         for (projectEntity in currentProjectScene.entities) {

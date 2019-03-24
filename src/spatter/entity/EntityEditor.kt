@@ -6,7 +6,6 @@ import rain.api.entity.EntitySystem
 import rain.api.gfx.*
 import rain.api.scene.Camera
 import rain.api.scene.Scene
-import spatter.EditMode
 import spatter.project.ProjectEntityInstance
 import spatter.project.currentProjectScene
 
@@ -44,16 +43,6 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
                 if (entityEditorDialog.selectedEntity != null) {
                     val mx = input.mousePosition.x.toFloat() - camera.x
                     val my = input.mousePosition.y.toFloat() - camera.y
-                    entityEditorDialog.selectedEntity!!.instances.add(
-                        ProjectEntityInstance(
-                            mx,
-                            my,
-                            1.0f,
-                            entityEditorDialog.selectedImageIndex.x,
-                            entityEditorDialog.selectedImageIndex.y,
-                            32.0f, 32.0f
-                        )
-                    )
 
                     val entity = Entity()
                     entitySystem.newEntity(entity)
@@ -66,6 +55,18 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
                     entity.transform.z = 1.0f
                     entity.getRenderComponents()[0].textureTileOffset.x = entityEditorDialog.selectedImageIndex.x
                     entity.getRenderComponents()[0].textureTileOffset.y = entityEditorDialog.selectedImageIndex.y
+
+                    entityEditorDialog.selectedEntity!!.instances.add(
+                        ProjectEntityInstance(
+                            mx,
+                            my,
+                            1.0f,
+                            entityEditorDialog.selectedImageIndex.x,
+                            entityEditorDialog.selectedImageIndex.y,
+                            32.0f, 32.0f,
+                            entity
+                        )
+                    )
                 }
             }
         }

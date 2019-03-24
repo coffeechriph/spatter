@@ -1,15 +1,14 @@
 package spatter
 
-import kotlinx.serialization.json.Json
 import rain.api.Window
-import rain.api.gui.v2.*
+import rain.api.gui.v2.Button
+import rain.api.gui.v2.GridLayout
+import rain.api.gui.v2.Panel
+import rain.api.gui.v2.guiManagerCreatePanel
 import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
-import spatter.project.ProjectScene
-import spatter.project.currentProjectScene
-import spatter.tilemap.TilemapEditorDialog
 import spatter.tilemap.NewTilemapDialog
-import java.io.File
+import spatter.tilemap.TilemapEditorDialog
 
 const val TOOLS_PANEL_HEIGHT = 34.0f
 

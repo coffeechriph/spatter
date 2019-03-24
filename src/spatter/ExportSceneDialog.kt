@@ -1,11 +1,8 @@
 package spatter
 
-import kotlinx.serialization.json.Json
 import rain.api.Window
 import rain.api.gui.v2.*
-import spatter.project.ProjectScene
 import spatter.project.currentProjectScene
-import java.io.File
 
 class ExportSceneDialog(window: Window): EditorDialog {
     private val panel: Panel
@@ -28,15 +25,7 @@ class ExportSceneDialog(window: Window): EditorDialog {
 
     fun update() {
         if (exportButton.clicked) {
-            val json = Json.stringify(ProjectScene.serializer(), currentProjectScene)
-
-            // TODO: We want to specify actual project directories
-            if (!File("projects").exists()) {
-                File("projects").mkdir()
-                File("projects/project1").mkdir()
-                File("projects/project1/scenes").mkdir()
-            }
-            File("projects/project1/scenes/${fileNameField.string}.json").writeText(json)
+            currentProjectScene.export(fileNameField.string)
             hide()
         }
     }

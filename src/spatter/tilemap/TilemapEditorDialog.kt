@@ -6,8 +6,11 @@ import rain.api.gfx.Material
 import rain.api.gfx.ResourceFactory
 import rain.api.gui.v2.*
 import rain.api.scene.Scene
-import spatter.*
-import spatter.project.SceneMetadata
+import rain.api.scene.parse.SceneMetadata
+import spatter.EditMode
+import spatter.EditorDialog
+import spatter.TOOLS_PANEL_HEIGHT
+import spatter.editorSkin
 import spatter.project.TilemapData
 import spatter.project.TilemapLayer
 
@@ -210,8 +213,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
 
                 tilemap.transform.z = selectedTilemapData.activeLayer.tilemapRef.transform.z + 1.0f
 
-                val newLayer = TilemapLayer(mutableListOf(), mutableListOf())
-                newLayer.tilemapRef = tilemap
+                val newLayer = TilemapLayer(mutableListOf(), mutableListOf(), tilemap)
                 selectedTilemapData.layers.add(newLayer)
 
                 val button = tileLayerPanel.createToggleButton("Layer:${currentActiveLayers.size}")

@@ -68,13 +68,9 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             defaultIndexSet.add(i)
         }
         val defaultGroup = TileGroup(0, 0, defaultIndexSet)
-        val defaultLayer =
-            TilemapLayer(mutableListOf(defaultGroup), mutableListOf())
-        defaultLayer.tilemapRef = tilemap
+        val defaultLayer = TilemapLayer(mutableListOf(defaultGroup), mutableListOf(), tilemap)
 
-        val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, ArrayList())
-        tilemapData.activeLayer = defaultLayer
-        tilemapData.layers.add(defaultLayer)
+        val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, mutableListOf(defaultLayer), defaultLayer)
         currentProjectScene.mapData.add(tilemapData)
     }
 

@@ -4,11 +4,13 @@ import org.joml.Vector2i
 import rain.api.Window
 import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
+import rain.api.scene.parse.SceneMetadata
 import rain.assertion
-import spatter.*
+import spatter.EditorDialog
+import spatter.TOOLS_PANEL_HEIGHT
+import spatter.editorSkin
 import spatter.project.ProjectEntity
 import spatter.project.ProjectScene
-import spatter.project.SceneMetadata
 import spatter.project.currentProjectScene
 
 class EntityEditorDialog(private val window: Window): EditorDialog {
