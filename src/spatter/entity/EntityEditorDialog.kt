@@ -25,12 +25,12 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
     private val entityHeightField: TextField
     private var metadataPanel: Panel
     private var metadataLayout = FillRowLayout()
-    private var newMetadataEntryLabel: Label
     private var newMetadataEntryButton: Button
 
     var selectedEntity: ProjectEntity? = null
     private var currentProjectEntities = ArrayList<ToggleButton>()
     private var currentActiveMetadata = ArrayList<TextField>()
+    private val currentActiveMetadataRemoveButtons = ArrayList<Button>()
 
     var selectedImageIndex: Vector2i = Vector2i(0,0)
     var visible = false
@@ -80,7 +80,7 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         entityHeightLabel = entityPropertiesPanel.createLabel("Height")
         entityHeightField = entityPropertiesPanel.createTextField("32")
 
-        metadataLayout.componentsPerRow = 2
+        metadataLayout.componentsPerRow = 3
         metadataLayout.componentHeight = 24.0f
         metadataPanel = guiManagerCreatePanel(metadataLayout)
         metadataPanel.w = 300.0f
@@ -89,7 +89,6 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         metadataPanel.resizable = false
         metadataPanel.moveable = false
         metadataPanel.visible = false
-        newMetadataEntryLabel = metadataPanel.createLabel("New Metadata")
         newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
@@ -176,13 +175,35 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
         }
 
         if (selectedEntity != null && newMetadataEntryButton.clicked) {
+            metadataPanel.removeComponent(newMetadataEntryButton)
             val metadata = SceneMetadata("name", "value")
             selectedEntity!!.metadata.add(metadata)
 
             val nameField = metadataPanel.createTextField(metadata.name)
             val valueField = metadataPanel.createTextField(metadata.value)
+            val removeButton = metadataPanel.createButton("-")
             currentActiveMetadata.add(nameField)
             currentActiveMetadata.add(valueField)
+            currentActiveMetadataRemoveButtons.add(removeButton)
+            newMetadataEntryButton = metadataPanel.createButton("+")
+        }
+
+        var buttonIndex = -1
+        for ((index, button) in currentActiveMetadataRemoveButtons.withIndex()) {
+            if (button.clicked) {
+                selectedEntity!!.metadata.removeAt(index)
+                metadataPanel.removeComponent(currentActiveMetadata[index*2])
+                metadataPanel.removeComponent(currentActiveMetadata[index*2+1])
+                metadataPanel.removeComponent(button)
+                currentActiveMetadata.removeAt(index*2)
+                currentActiveMetadata.removeAt(index*2)
+                buttonIndex = index
+                break
+            }
+        }
+
+        if (buttonIndex >= 0) {
+            currentActiveMetadataRemoveButtons.removeAt(buttonIndex)
         }
 
         var index = 0
