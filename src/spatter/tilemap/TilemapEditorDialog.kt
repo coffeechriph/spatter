@@ -303,10 +303,15 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     }
 
     private fun populateMetadataButtons(selectedTilemapData: TilemapData) {
-        for (button in currentActiveMetadata) {
-            metadataPanel.removeComponent(button)
+        for (field in currentActiveMetadata) {
+            metadataPanel.removeComponent(field)
         }
         currentActiveMetadata.clear()
+
+        for (button in currentActiveMetadataRemoveButtons) {
+            metadataPanel.removeComponent(button)
+        }
+        currentActiveMetadataRemoveButtons.clear()
 
         metadataPanel.removeComponent(newMetadataEntryButton)
         for (data in selectedTilemapData.activeLayer.metadata) {
