@@ -5,12 +5,11 @@ import rain.api.gui.v2.*
 import spatter.project.currentProjectScene
 
 class ExportSceneDialog(window: Window): EditorDialog {
-    private val panel: Panel
+    private val panel: rain.api.gui.v2.Window = guiManagerCreateWindow(FillRowLayout(), "Export Scene")
     private val fileNameField: TextField
     private val exportButton: Button
 
     init {
-        panel = guiManagerCreatePanel(FillRowLayout())
         panel.w = 200.0f
         panel.h = 100.0f
         panel.x = window.size.x / 2.0f - 100.0f

@@ -35,7 +35,7 @@ class NewTilemapDialog(private val window: Window): EditorDialog {
         private set
 
     private var layout: FillRowLayout = FillRowLayout()
-    private var panel: Panel
+    private var panel: rain.api.gui.v2.Window
     private var widthLabel: Label
     private var heightLabel: Label
     private var widthTextField: TextField
@@ -48,12 +48,12 @@ class NewTilemapDialog(private val window: Window): EditorDialog {
     private val doneButton: Button
 
     init {
-        layout.componentsPerRow = 1
+        layout.componentsPerRow = 2
         layout.componentHeight = 24.0f
 
-        panel = guiManagerCreatePanel(layout)
-        panel.w = 100.0f
-        panel.h = 400.0f
+        panel = guiManagerCreateWindow(layout, "New Tilemap")
+        panel.w = 200.0f
+        panel.h = 200.0f
         panel.skin = editorSkin
         panel.visible = false
 

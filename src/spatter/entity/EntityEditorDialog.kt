@@ -17,7 +17,7 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
     private var layout: GridLayout = GridLayout()
     private var entityTypeLayout = FillRowLayout()
     private var imageSelectorPanel: Panel
-    private var entityTypePanel: Panel
+    private var entityTypePanel: rain.api.gui.v2.Window
     private var entityPropertiesPanel: Panel
     private var entityWidthLabel: Label
     private var entityHeightLabel: Label
@@ -58,7 +58,7 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
 
         entityTypeLayout.componentsPerRow = 2
         entityTypeLayout.componentHeight = 20.0f
-        entityTypePanel = guiManagerCreatePanel(entityTypeLayout)
+        entityTypePanel = guiManagerCreateWindow(entityTypeLayout, "Edit Entity")
         entityTypePanel.w = 300.0f
         entityTypePanel.h = panelHeight
         entityTypePanel.skin = editorSkin
@@ -101,17 +101,9 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
     }
 
     fun update(projectScene: ProjectScene, selectedTilemapTexture: Texture2d) {
-        entityTypePanel.x = window.size.x - entityTypePanel.w
-        entityTypePanel.y = TOOLS_PANEL_HEIGHT
-
-        entityPropertiesPanel.x = window.size.x - entityPropertiesPanel.w
-        entityPropertiesPanel.y = entityTypePanel.y + entityTypePanel.h
-
-        imageSelectorPanel.x = window.size.x - imageSelectorPanel.w
-        imageSelectorPanel.y = entityPropertiesPanel.y + entityPropertiesPanel.h
-
-        metadataPanel.x = window.size.x - metadataPanel.w
-        metadataPanel.y = imageSelectorPanel.y + imageSelectorPanel.h
+        imageSelectorPanel.visible = entityTypePanel.visible
+        metadataPanel.visible = entityTypePanel.visible
+        entityPropertiesPanel.visible = entityTypePanel.visible
 
         if (updateImageSelector) {
             updateImageSelector = false
@@ -135,13 +127,6 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
                     ty += 1
                 }
             }
-
-            entityTypePanel.x = window.size.x - entityTypePanel.w - imageSelectorPanel.w
-            entityTypePanel.y = window.size.y - entityTypePanel.h - imageSelectorPanel.h
-            imageSelectorPanel.x = entityTypePanel.x + entityTypePanel.w
-            imageSelectorPanel.y = entityTypePanel.y
-            metadataPanel.x = entityTypePanel.x - metadataPanel.w
-            metadataPanel.y = entityTypePanel.y
         }
 
         if (entityWidthField.textEdited) {
@@ -273,6 +258,18 @@ class EntityEditorDialog(private val window: Window): EditorDialog {
     }
 
     override fun show() {
+        entityTypePanel.x = window.size.x - entityTypePanel.w
+        entityTypePanel.y = TOOLS_PANEL_HEIGHT
+
+        entityPropertiesPanel.x = window.size.x - entityPropertiesPanel.w
+        entityPropertiesPanel.y = entityTypePanel.y + entityTypePanel.h
+
+        imageSelectorPanel.x = window.size.x - imageSelectorPanel.w
+        imageSelectorPanel.y = entityPropertiesPanel.y + entityPropertiesPanel.h
+
+        metadataPanel.x = window.size.x - metadataPanel.w
+        metadataPanel.y = imageSelectorPanel.y + imageSelectorPanel.h
+
         if (selectedEntity == null && currentProjectScene.entities.isNotEmpty()) {
             selectedEntity = currentProjectScene.entities.values.first()
         }

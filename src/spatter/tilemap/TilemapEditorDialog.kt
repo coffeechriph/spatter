@@ -21,7 +21,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var tileLayerPanel: Panel
     private var metadataPanel: Panel
 
-    private var tileEditorToolPanel: Panel
+    private var tileEditorToolPanel: rain.api.gui.v2.Window
     private val tileEditorEditButton: ToggleButton
     private val tileEditorRemoveButton: ToggleButton
 
@@ -49,8 +49,8 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     init {
         val tileToolPanelLayout = FillRowLayout()
         tileToolPanelLayout.componentsPerRow = 3
-        tileEditorToolPanel = guiManagerCreatePanel(tileToolPanelLayout)
-        tileEditorToolPanel.h = 30.0f
+        tileEditorToolPanel = guiManagerCreateWindow(tileToolPanelLayout, "Tile Edit")
+        tileEditorToolPanel.h = 65.0f
         tileEditorToolPanel.w = 300.0f
         tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
         tileEditorToolPanel.skin = editorSkin
@@ -98,11 +98,15 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     }
 
     fun update(selectedTilemapData: TilemapData?, tileMaterial: Material, scene: Scene) {
+        tileSelectorPanel.visible = tileEditorToolPanel.visible
+        metadataPanel.visible = tileEditorToolPanel.visible
+        tileLayerPanel.visible = tileEditorToolPanel.visible
+
         tileEditorToolPanel.x = window.size.x - tileEditorToolPanel.w
         tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
 
         tileLayerPanel.x = window.size.x - tileLayerPanel.w
-        tileLayerPanel.y = TOOLS_PANEL_HEIGHT + tileEditorToolPanel.y
+        tileLayerPanel.y = tileEditorToolPanel.y + tileEditorToolPanel.h
 
         tileSelectorPanel.x = window.size.x - tileSelectorPanel.w
         tileSelectorPanel.y = tileLayerPanel.y + tileLayerPanel.h

@@ -9,6 +9,8 @@ import rain.api.Window
 import rain.api.entity.Entity
 import rain.api.gfx.Mesh
 import rain.api.gfx.ResourceFactory
+import rain.api.gui.v2.FillRowLayout
+import rain.api.gui.v2.guiManagerCreateWindow
 import rain.api.scene.Camera
 import rain.api.scene.Scene
 import rain.api.scene.parse.JsonSceneLoader
@@ -26,7 +28,6 @@ import java.nio.charset.StandardCharsets
 
 /*
     TODO: Must fix
-    1) Delete metadata
     2) Close every popup without performing action
     3) Delete tilemaps
     4) Delete layers
