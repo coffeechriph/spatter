@@ -24,6 +24,16 @@ import spatter.tilemap.TilemapEditorDialog
 import java.io.File
 import java.nio.charset.StandardCharsets
 
+/*
+    TODO: Must fix
+    1) Delete metadata
+    2) Close every popup without performing action
+    3) Delete tilemaps
+    4) Delete layers
+    5) Delete entities
+    6) Fit entities to current hovered tilemap (unless specified to be free-positioned)
+    7) Ghost entities without a sprite attached
+ */
 class EditorState(private val window: Window, stateManager: StateManager): State(stateManager) {
     private lateinit var toolsPanel: ToolsPanel
     private lateinit var tilemapEditor: TilemapEditor

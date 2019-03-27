@@ -29,13 +29,13 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
     private var createTileLayerButton: Button
 
     private var metadataLayout = FillRowLayout()
-    private var newMetadataEntryLabel: Label
     private var newMetadataEntryButton: Button
 
     private var selectedTilemapData: TilemapData? = null
     private var currentActiveLayers = ArrayList<ToggleButton>()
 
     private var currentActiveMetadata = ArrayList<TextField>()
+    private var currentActiveMetadataRemoveButtons = ArrayList<Button>()
 
     var selectedTileIndex: Vector2i = Vector2i(0,0)
         private set
@@ -85,7 +85,7 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
         createTileLayerLabel = tileLayerPanel.createLabel("Layers")
         createTileLayerButton = tileLayerPanel.createButton("+")
 
-        metadataLayout.componentsPerRow = 2
+        metadataLayout.componentsPerRow = 3
         metadataLayout.componentHeight = 24.0f
         metadataPanel = guiManagerCreatePanel(metadataLayout)
         metadataPanel.w = 300.0f
@@ -94,11 +94,10 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
         metadataPanel.resizable = false
         metadataPanel.moveable = false
         metadataPanel.visible = false
-        newMetadataEntryLabel = metadataPanel.createLabel("New Metadata")
         newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
-    fun update(selectedTilemapData: TilemapData?, tileMaterial: Material, scene: Scene, resourceFactory: ResourceFactory) {
+    fun update(selectedTilemapData: TilemapData?, tileMaterial: Material, scene: Scene) {
         tileEditorToolPanel.x = window.size.x - tileEditorToolPanel.w
         tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
 
@@ -221,13 +220,35 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
             }
 
             if (newMetadataEntryButton.clicked) {
+                metadataPanel.removeComponent(newMetadataEntryButton)
                 val metadata = SceneMetadata("name", "value")
                 selectedTilemapData.activeLayer.metadata.add(metadata)
 
                 val nameField = metadataPanel.createTextField(metadata.name)
                 val valueField = metadataPanel.createTextField(metadata.value)
+                val removeButton = metadataPanel.createButton("-")
                 currentActiveMetadata.add(nameField)
                 currentActiveMetadata.add(valueField)
+                currentActiveMetadataRemoveButtons.add(removeButton)
+                newMetadataEntryButton = metadataPanel.createButton("+")
+            }
+
+            var buttonIndex = -1
+            for ((index,button) in currentActiveMetadataRemoveButtons.withIndex()) {
+                if (button.clicked) {
+                    selectedTilemapData.activeLayer.metadata.removeAt(index)
+                    metadataPanel.removeComponent(currentActiveMetadata[index*2])
+                    metadataPanel.removeComponent(currentActiveMetadata[index*2+1])
+                    metadataPanel.removeComponent(button)
+                    currentActiveMetadata.removeAt(index*2)
+                    currentActiveMetadata.removeAt(index*2)
+                    buttonIndex = index
+                    break
+                }
+            }
+
+            if (buttonIndex >= 0) {
+                currentActiveMetadataRemoveButtons.removeAt(buttonIndex)
             }
 
             var index = 0
@@ -283,12 +304,16 @@ class TilemapEditorDialog(private val window: Window): EditorDialog {
         }
         currentActiveMetadata.clear()
 
+        metadataPanel.removeComponent(newMetadataEntryButton)
         for (data in selectedTilemapData.activeLayer.metadata) {
             val nameField = metadataPanel.createTextField(data.name)
             val valueField = metadataPanel.createTextField(data.value)
+            val removeButton = metadataPanel.createButton("-")
             currentActiveMetadata.add(nameField)
             currentActiveMetadata.add(valueField)
+            currentActiveMetadataRemoveButtons.add(removeButton)
         }
+        newMetadataEntryButton = metadataPanel.createButton("+")
     }
 
     override fun shown(): Boolean {

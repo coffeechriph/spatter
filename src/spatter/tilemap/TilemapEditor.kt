@@ -80,7 +80,7 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
             selectedTilemapData = currentProjectScene.mapData[0]
         }
 
-        tilemapEditorDialog.update(selectedTilemapData, tilemapMaterial, scene, resourceFactory)
+        tilemapEditorDialog.update(selectedTilemapData, tilemapMaterial, scene)
         if (tilemapEditorDialog.shown()) {
             if (tilemapEditorDialog.selectedEditorMode == EditMode.ADD) {
                 if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED ||
