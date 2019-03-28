@@ -1,21 +1,15 @@
 package spatter
 
-import kotlinx.serialization.json.Json
 import org.joml.Vector2i
 import rain.State
 import rain.StateManager
 import rain.api.Input
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.entity.Entity
-import rain.api.gfx.Mesh
 import rain.api.gfx.ResourceFactory
-import rain.api.gui.v2.FillRowLayout
-import rain.api.gui.v2.guiManagerCreateWindow
 import rain.api.scene.Camera
 import rain.api.scene.Scene
 import rain.api.scene.parse.JsonSceneLoader
-import rain.api.scene.parse.SceneDefinition
-import rain.api.scene.parse.SceneMetadata
 import spatter.entity.EntityEditor
 import spatter.entity.EntityEditorDialog
 import spatter.entity.NewEntityDialog
@@ -23,8 +17,6 @@ import spatter.project.*
 import spatter.tilemap.NewTilemapDialog
 import spatter.tilemap.TilemapEditor
 import spatter.tilemap.TilemapEditorDialog
-import java.io.File
-import java.nio.charset.StandardCharsets
 
 /*
     TODO: Must fix
@@ -35,7 +27,7 @@ import java.nio.charset.StandardCharsets
     6) Fit entities to current hovered tilemap (unless specified to be free-positioned)
     7) Ghost entities without a sprite attached
  */
-class EditorState(private val window: Window, stateManager: StateManager): State(stateManager) {
+class EditorState(private val window: WindowContext, stateManager: StateManager): State(stateManager) {
     private lateinit var toolsPanel: ToolsPanel
     private lateinit var tilemapEditor: TilemapEditor
     private lateinit var entityEditor: EntityEditor
@@ -96,6 +88,7 @@ class EditorState(private val window: Window, stateManager: StateManager): State
 
         if (loadSceneDialog.hasSelected) {
             val loadedScene = JsonSceneLoader().load("./projects/project1/scenes/" + loadSceneDialog.lastSelectedItem!!.string)
+            scene.clear()
             val sceneMap = ArrayList<TilemapData>()
             for (data in loadedScene.map) {
                 var depth = 0.0f
@@ -120,6 +113,7 @@ class EditorState(private val window: Window, stateManager: StateManager): State
                     depth += 1.0f
                 }
 
+                window.title = "Scene: ${loadSceneDialog.lastSelectedItem!!.string}"
                 sceneMap.add(TilemapData(data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight, tileLayers, tileLayers[0]))
             }
 

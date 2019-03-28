@@ -1,6 +1,6 @@
 package spatter
 
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gui.v2.Button
 import rain.api.gui.v2.GridLayout
 import rain.api.gui.v2.Panel
@@ -12,7 +12,7 @@ import spatter.tilemap.TilemapEditorDialog
 
 const val TOOLS_PANEL_HEIGHT = 34.0f
 
-class ToolsPanel(private val window: Window,
+class ToolsPanel(private val window: WindowContext,
                  private val materialProperties: MaterialPropertiesDialog,
                  private val newTilemapDialog: NewTilemapDialog,
                  private val tilemapEditorDialog: TilemapEditorDialog,

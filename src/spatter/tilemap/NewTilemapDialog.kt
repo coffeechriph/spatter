@@ -1,11 +1,11 @@
 package spatter.tilemap
 
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gui.v2.*
 import spatter.EditorDialog
 import spatter.editorSkin
 
-class NewTilemapDialog(private val window: Window): EditorDialog {
+class NewTilemapDialog(private val window: WindowContext): EditorDialog {
     var numTileX = 0
         get() {
             field = widthTextField.string.toInt()

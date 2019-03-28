@@ -1,7 +1,7 @@
 package spatter.entity
 
 import org.joml.Vector2i
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gfx.Texture2d
 import rain.api.gui.v2.*
 import rain.api.scene.parse.SceneMetadata
@@ -13,11 +13,11 @@ import spatter.project.ProjectEntity
 import spatter.project.ProjectScene
 import spatter.project.currentProjectScene
 
-class EntityEditorDialog(private val window: Window): EditorDialog {
+class EntityEditorDialog(private val window: WindowContext): EditorDialog {
     private var layout: GridLayout = GridLayout()
     private var entityTypeLayout = FillRowLayout()
     private var imageSelectorPanel: Panel
-    private var entityTypePanel: rain.api.gui.v2.Window
+    private var entityTypePanel: Window
     private var entityPropertiesPanel: Panel
     private var entityWidthLabel: Label
     private var entityHeightLabel: Label

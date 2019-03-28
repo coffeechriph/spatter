@@ -1,11 +1,11 @@
 package spatter
 
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gui.v2.*
 import spatter.project.currentProjectScene
 
-class ExportSceneDialog(window: Window): EditorDialog {
-    private val panel: rain.api.gui.v2.Window = guiManagerCreateWindow(FillRowLayout(), "Export Scene")
+class ExportSceneDialog(window: WindowContext): EditorDialog {
+    private val panel: Window = guiManagerCreateWindow(FillRowLayout(), "Export Scene")
     private val fileNameField: TextField
     private val exportButton: Button
 

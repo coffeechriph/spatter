@@ -1,12 +1,12 @@
 package spatter
 
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gui.v2.*
 import java.io.File
 
 private data class FileItem(val parent: FileItem?, val path: String, val name: String, val children: MutableList<FileItem>)
 
-class FileChooseDialog(private val window: Window) {
+class FileChooseDialog(private val window: WindowContext) {
     val isOpen: Boolean
         get() {
             return panel.visible
@@ -14,14 +14,13 @@ class FileChooseDialog(private val window: Window) {
 
     var hasSelected: Boolean = false
     var lastSelectedItem: ListItem? = null
-    private val panel: Panel
+    private val panel: Window = guiManagerCreateWindow(FillRowLayout(), "File Select")
     private val directoryLabel: Label
     private val selectButton: Button
     private val fileTreeView: TreeView
     private val fileItems = ArrayList<FileItem>()
 
     init {
-        panel = guiManagerCreatePanel(FillRowLayout())
         panel.w = (window.size.x / 4).toFloat()
         panel.h = 400.0f
         panel.x = window.size.x / 2 - panel.w / 2
@@ -93,6 +92,7 @@ class FileChooseDialog(private val window: Window) {
     }
 
     fun update() {
+        fileTreeView.visible = panel.visible
         hasSelected = false
         fileTreeView.x = panel.x + panel.w
         fileTreeView.y = panel.y

@@ -1,13 +1,13 @@
 package spatter.entity
 
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gui.v2.*
 import spatter.EditorDialog
 import spatter.editorSkin
 import spatter.project.ProjectEntity
 import spatter.project.ProjectScene
 
-class NewEntityDialog(private val window: Window): EditorDialog {
+class NewEntityDialog(private val window: WindowContext): EditorDialog {
     private val panelLayout = FillRowLayout()
     private val panel: Panel
     private val entityNameLabel: Label

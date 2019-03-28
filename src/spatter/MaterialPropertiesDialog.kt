@@ -1,9 +1,9 @@
 package spatter
 
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gui.v2.*
 
-class MaterialPropertiesDialog(window: Window): EditorDialog {
+class MaterialPropertiesDialog(window: WindowContext): EditorDialog {
     private val panel: Panel
     private val selectVertexShader: Button
     private val vertexShaderLabel: Label

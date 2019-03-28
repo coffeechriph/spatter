@@ -1,9 +1,8 @@
 package spatter.tilemap
 
 import org.joml.Vector2i
-import rain.api.Window
+import rain.api.WindowContext
 import rain.api.gfx.Material
-import rain.api.gfx.ResourceFactory
 import rain.api.gui.v2.*
 import rain.api.scene.Scene
 import rain.api.scene.parse.SceneMetadata
@@ -14,14 +13,14 @@ import spatter.editorSkin
 import spatter.project.TilemapData
 import spatter.project.TilemapLayer
 
-class TilemapEditorDialog(private val window: Window): EditorDialog {
+class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
     private var layout: GridLayout = GridLayout()
     private var tileLayerLayout = FillRowLayout()
     private var tileSelectorPanel: Panel
     private var tileLayerPanel: Panel
     private var metadataPanel: Panel
 
-    private var tileEditorToolPanel: rain.api.gui.v2.Window
+    private var tileEditorToolPanel: Window
     private val tileEditorEditButton: ToggleButton
     private val tileEditorRemoveButton: ToggleButton
 
