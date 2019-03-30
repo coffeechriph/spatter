@@ -79,6 +79,9 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
         if (currentProjectScene.mapData.size > 0) {
             selectedTilemapData = currentProjectScene.mapData[0]
         }
+        else {
+            selectedTilemapData = null
+        }
 
         tilemapEditorDialog.update(selectedTilemapData, tilemapMaterial, scene)
         if (tilemapEditorDialog.shown()) {

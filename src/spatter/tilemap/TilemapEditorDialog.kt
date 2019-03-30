@@ -12,6 +12,7 @@ import spatter.TOOLS_PANEL_HEIGHT
 import spatter.editorSkin
 import spatter.project.TilemapData
 import spatter.project.TilemapLayer
+import spatter.project.currentProjectScene
 
 class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
     private var layout: GridLayout = GridLayout()
@@ -35,6 +36,7 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
 
     private var currentActiveMetadata = ArrayList<TextField>()
     private var currentActiveMetadataRemoveButtons = ArrayList<Button>()
+    private var tileLayerRemoveButtons = ArrayList<Button>()
 
     var selectedTileIndex: Vector2i = Vector2i(0,0)
         private set
@@ -153,6 +155,37 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         }
 
         if (selectedTilemapData != null) {
+            var removeLayerAt = -1
+            for ((index, button) in tileLayerRemoveButtons.withIndex()) {
+                if (button.clicked) {
+                    scene.removeTilemap(selectedTilemapData.layers[index].tilemapRef)
+                    val removedLayer = selectedTilemapData.layers.removeAt(index)
+
+                    if (selectedTilemapData.activeLayer == removedLayer) {
+                        if (index > 0) {
+                            selectedTilemapData.activeLayer = selectedTilemapData.layers[index-1]
+                        }
+                        else if (selectedTilemapData.layers.size > 0){
+                            selectedTilemapData.activeLayer = selectedTilemapData.layers[0]
+                        }
+                        else {
+                            currentProjectScene.mapData.remove(selectedTilemapData)
+                            this.selectedTilemapData = null
+                        }
+                    }
+
+                    tileLayerPanel.removeComponent(button)
+                    tileLayerPanel.removeComponent(currentActiveLayers[index])
+                    currentActiveLayers.removeAt(index)
+                    removeLayerAt = index
+                    break
+                }
+            }
+
+            if (removeLayerAt >= 0) {
+                tileLayerRemoveButtons.removeAt(removeLayerAt)
+            }
+
             populateActiveLayerButtons(selectedTilemapData)
             this.selectedTilemapData = selectedTilemapData
 
@@ -219,7 +252,9 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
                 selectedTilemapData.layers.add(newLayer)
 
                 val button = tileLayerPanel.createToggleButton("Layer:${currentActiveLayers.size}")
+                val remove = tileLayerPanel.createButton("-")
                 currentActiveLayers.add(button)
+                tileLayerRemoveButtons.add(remove)
             }
 
             if (newMetadataEntryButton.clicked) {
@@ -285,17 +320,24 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
             for (button in currentActiveLayers) {
                 tileLayerPanel.removeComponent(button)
             }
+
+            for (button in tileLayerRemoveButtons) {
+                tileLayerPanel.removeComponent(button)
+            }
+
             this.selectedTilemapData = selectedTilemapData
             currentActiveLayers.clear()
-
+            tileLayerRemoveButtons.clear()
             for (i in 0 until selectedTilemapData.layers.size) {
                 val button = tileLayerPanel.createToggleButton("Layer:$i")
+                val removeButton = tileLayerPanel.createButton("-")
 
                 if (selectedTilemapData.layers.indexOf(selectedTilemapData.activeLayer) == i) {
                     button.checked = true
                 }
 
                 currentActiveLayers.add(button)
+                tileLayerRemoveButtons.add(removeButton)
             }
             populateMetadataButtons(selectedTilemapData)
         }

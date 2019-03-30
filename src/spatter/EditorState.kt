@@ -20,7 +20,6 @@ import spatter.tilemap.TilemapEditorDialog
 
 /*
     TODO: Must fix
-    2) Close every popup without performing action
     3) Delete tilemaps
     4) Delete layers
     5) Delete entities
