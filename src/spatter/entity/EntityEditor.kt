@@ -19,11 +19,11 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
     init {
         spriteTexture = resourceFactory.buildTexture2d()
             .withName("spriteTexture")
-            .fromImageFile("./data/textures/tiles.png")
+            .fromImageFile("./data/textures/tilemap_8x8.png")
             .withFilter(TextureFilter.NEAREST)
             .build()
 
-        spriteTexture.setTiledTexture(16,16)
+        spriteTexture.setTiledTexture(8,8)
         spriteMaterial = resourceFactory.buildMaterial()
             .withName("spriteMaterial")
             .withVertexShader("./data/shaders/basic.vert.spv")

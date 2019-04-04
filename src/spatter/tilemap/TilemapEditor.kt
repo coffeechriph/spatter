@@ -27,11 +27,11 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     init {
         tilemapTexture = resourceFactory.buildTexture2d()
             .withName("tilemapTexture")
-            .fromImageFile("./data/textures/tiles.png")
+            .fromImageFile("./data/textures/tilemap_8x8.png")
             .withFilter(TextureFilter.NEAREST)
             .build()
 
-        tilemapTexture.setTiledTexture(16,16)
+        tilemapTexture.setTiledTexture(8,8)
         tilemapMaterial = resourceFactory.buildMaterial()
             .withName("tilemapMaterial")
             .withVertexShader("./data/shaders/tilemap.vert.spv")

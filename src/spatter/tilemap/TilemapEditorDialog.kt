@@ -52,7 +52,7 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         tileToolPanelLayout.componentsPerRow = 3
         tileEditorToolPanel = guiManagerCreateWindow(tileToolPanelLayout, "Tile Edit")
         tileEditorToolPanel.h = 65.0f
-        tileEditorToolPanel.w = 300.0f
+        tileEditorToolPanel.w = 318.0f
         tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
         tileEditorToolPanel.skin = editorSkin
         tileEditorToolPanel.visible = false
@@ -61,12 +61,12 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         tileEditorEditButton.checked = true
         tileEditorRemoveButton = tileEditorToolPanel.createToggleButton("Remove")
 
-        layout.gridW = 50.0f
-        layout.gridH = 50.0f
+        layout.gridW = 48.0f
+        layout.gridH = 48.0f
 
         val panelHeight = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f - 10.0f
         tileSelectorPanel = guiManagerCreatePanel(layout)
-        tileSelectorPanel.w = 300.0f
+        tileSelectorPanel.w = 318.0f
         tileSelectorPanel.h = panelHeight
         tileSelectorPanel.skin = editorSkin
         tileSelectorPanel.visible = false
@@ -76,7 +76,7 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         tileLayerLayout.componentsPerRow = 2
         tileLayerLayout.componentHeight = 20.0f
         tileLayerPanel = guiManagerCreatePanel(tileLayerLayout)
-        tileLayerPanel.w = 300.0f
+        tileLayerPanel.w = 318.0f
         tileLayerPanel.h = panelHeight
         tileLayerPanel.skin = editorSkin
         tileLayerPanel.visible = false
@@ -89,7 +89,7 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         metadataLayout.componentsPerRow = 3
         metadataLayout.componentHeight = 24.0f
         metadataPanel = guiManagerCreatePanel(metadataLayout)
-        metadataPanel.w = 300.0f
+        metadataPanel.w = 318.0f
         metadataPanel.h = panelHeight
         metadataPanel.skin = editorSkin
         metadataPanel.resizable = false
