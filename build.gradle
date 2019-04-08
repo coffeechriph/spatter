@@ -39,20 +39,12 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile name: 'rain-1.0'
+    api name: 'rain-1.0'
     runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-vma:$lwjglVersion:$lwjglNatives"
-    implementation "org.joml:joml:${jomlVersion}"
-
-    // TODO: I would like to remove the gdx dependency
-    compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.10.0"
     
     if (os.contains("macosx")) {
         runtimeOnly "org.lwjgl:lwjgl-vulkan:$lwjglVersion:$lwjglNatives"
