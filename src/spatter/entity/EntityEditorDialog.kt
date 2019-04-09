@@ -12,6 +12,7 @@ import spatter.editorSkin
 import spatter.project.ProjectEntity
 import spatter.project.ProjectScene
 import spatter.project.currentProjectScene
+import java.util.*
 
 class EntityEditorDialog(private val window: WindowContext): EditorDialog {
     private var layout: GridLayout = GridLayout()

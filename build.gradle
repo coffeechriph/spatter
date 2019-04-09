@@ -40,6 +40,8 @@ repositories {
 
 dependencies {
     api name: 'rain-1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation group: "org.joml", name: 'joml', version: "$jomlVersion"
     runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"

@@ -1,5 +1,6 @@
 package spatter.tilemap
 
+import org.joml.Vector2i
 import rain.api.Input
 import rain.api.gfx.Material
 import rain.api.gfx.ResourceFactory
@@ -72,6 +73,17 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
 
         val tilemapData = TilemapData(numTileX, numTileY, tileW, tileH, mutableListOf(defaultLayer), defaultLayer)
         currentProjectScene.mapData.add(tilemapData)
+    }
+
+    fun hoveredTilemapGridSize(input: Input): Vector2i {
+        if (currentProjectScene.mapData.size > 0) {
+            return Vector2i(
+                currentProjectScene.mapData[0].tileWidth.toInt(),
+                currentProjectScene.mapData[0].tileHeight.toInt()
+            )
+        }
+
+        return Vector2i(1,1)
     }
 
     fun update(input: Input, camera: Camera) {

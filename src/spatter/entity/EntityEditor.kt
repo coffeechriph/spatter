@@ -1,17 +1,16 @@
 package spatter.entity
 
+import org.joml.Vector2i
 import rain.api.Input
 import rain.api.entity.Entity
-import rain.api.entity.EntitySystem
 import rain.api.gfx.*
 import rain.api.scene.Camera
 import rain.api.scene.Scene
 import spatter.project.ProjectEntityInstance
 import spatter.project.currentProjectScene
 
-class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val entityEditorDialog: EntityEditorDialog) {
+class EntityEditor(resourceFactory: ResourceFactory, private val entityEditorDialog: EntityEditorDialog) {
     var spriteTexture: Texture2d
-    var entitySystem: EntitySystem<Entity>
     var spriteMaterial: Material
     var entityQuad: VertexBuffer
     var entityMesh: Mesh
@@ -32,14 +31,13 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
             .withBlendEnabled(false)
             .build()
 
-        entitySystem = scene.newSystem(spriteMaterial)
         entityQuad = resourceFactory.buildVertexBuffer()
             .as2dQuad()
 
         entityMesh = Mesh(entityQuad, null)
     }
 
-    fun update(input: Input, camera: Camera) {
+    fun update(scene: Scene, input: Input, camera: Camera, gridSize: Vector2i) {
         entityEditorDialog.update(currentProjectScene, spriteTexture)
         if (entityEditorDialog.visible) {
             if (input.mouseState(Input.Button.MOUSE_BUTTON_LEFT) == Input.InputState.PRESSED) {
@@ -48,11 +46,11 @@ class EntityEditor(resourceFactory: ResourceFactory, scene: Scene, private val e
                     val my = input.mousePosition.y.toFloat() - camera.y
 
                     val entity = Entity()
-                    entitySystem.newEntity(entity)
+                    scene.newEntity(entity)
                         .attachRenderComponent(spriteMaterial, entityMesh)
                         .build()
-                    entity.transform.x = mx
-                    entity.transform.y = my
+                    entity.transform.x = ((mx.toInt() / gridSize.x) * gridSize.x).toFloat() + gridSize.x/2
+                    entity.transform.y = ((my.toInt() / gridSize.y) * gridSize.y).toFloat() + gridSize.y/2
                     entity.transform.sx = entityEditorDialog.entityWidth()
                     entity.transform.sy = entityEditorDialog.entityHeight()
                     entity.transform.z = 1.0f

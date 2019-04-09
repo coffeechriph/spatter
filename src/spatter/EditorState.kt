@@ -54,7 +54,7 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
         loadSceneDialog = FileChooseDialog(window)
         exportSceneDialog = ExportSceneDialog(window)
 
-        entityEditor = EntityEditor(resourceFactory, scene, entityEditorDialog)
+        entityEditor = EntityEditor(resourceFactory, entityEditorDialog)
         tilemapEditor = TilemapEditor(resourceFactory, scene, tilemapEditorDialog)
         toolsPanel = ToolsPanel(window, materialPropertiesDialog, newTilemapDialog, tilemapEditorDialog,
             newEntityDialog, entityEditorDialog, loadSceneDialog, exportSceneDialog)
@@ -70,7 +70,7 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
         exportSceneDialog.update()
 
         tilemapEditor.update(input, scene.activeCamera)
-        entityEditor.update(input, scene.activeCamera)
+        entityEditor.update(scene, input, scene.activeCamera, tilemapEditor.hoveredTilemapGridSize(input))
 
         if (newTilemapDialog.created) {
             tilemapEditor.createTilemap(
@@ -121,7 +121,7 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
                 val instances = ArrayList<ProjectEntityInstance>()
                 for (instance in entity.value.definitionInstances) {
                     val entityInstance = Entity()
-                    entityEditor.entitySystem.newEntity(entityInstance)
+                    scene.newEntity(entityInstance)
                         .attachRenderComponent(entityEditor.spriteMaterial, entityEditor.entityMesh)
                         .build()
 
