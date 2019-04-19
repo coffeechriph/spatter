@@ -64,7 +64,7 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         layout.gridW = 48.0f
         layout.gridH = 48.0f
 
-        val panelHeight = (window.size.y - TOOLS_PANEL_HEIGHT) / 3.0f - 10.0f
+        val panelHeight = (window.framebufferSize.y - TOOLS_PANEL_HEIGHT) / 3.0f - 10.0f
         tileSelectorPanel = guiManagerCreatePanel(layout)
         tileSelectorPanel.w = 318.0f
         tileSelectorPanel.h = panelHeight
@@ -103,16 +103,16 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
         metadataPanel.visible = tileEditorToolPanel.visible
         tileLayerPanel.visible = tileEditorToolPanel.visible
 
-        tileEditorToolPanel.x = window.size.x - tileEditorToolPanel.w
+        tileEditorToolPanel.x = window.framebufferSize.x - tileEditorToolPanel.w
         tileEditorToolPanel.y = TOOLS_PANEL_HEIGHT
 
-        tileLayerPanel.x = window.size.x - tileLayerPanel.w
+        tileLayerPanel.x = window.framebufferSize.x - tileLayerPanel.w
         tileLayerPanel.y = tileEditorToolPanel.y + tileEditorToolPanel.h
 
-        tileSelectorPanel.x = window.size.x - tileSelectorPanel.w
+        tileSelectorPanel.x = window.framebufferSize.x - tileSelectorPanel.w
         tileSelectorPanel.y = tileLayerPanel.y + tileLayerPanel.h
 
-        metadataPanel.x = window.size.x - metadataPanel.w
+        metadataPanel.x = window.framebufferSize.x - metadataPanel.w
         metadataPanel.y = tileSelectorPanel.y + tileSelectorPanel.h
 
         if (tileEditorEditButton.clicked){
@@ -146,8 +146,8 @@ class TilemapEditorDialog(private val window: WindowContext): EditorDialog {
                 }
             }
 
-            tileLayerPanel.x = window.size.x - tileLayerPanel.w - tileSelectorPanel.w
-            tileLayerPanel.y = window.size.y - tileLayerPanel.h - tileSelectorPanel.h
+            tileLayerPanel.x = window.framebufferSize.x - tileLayerPanel.w - tileSelectorPanel.w
+            tileLayerPanel.y = window.framebufferSize.y - tileLayerPanel.h - tileSelectorPanel.h
             tileSelectorPanel.x = tileLayerPanel.x + tileLayerPanel.w
             tileSelectorPanel.y = tileLayerPanel.y
             metadataPanel.x = tileLayerPanel.x - metadataPanel.w

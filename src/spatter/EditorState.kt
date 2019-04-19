@@ -1,14 +1,13 @@
 package spatter
 
 import org.joml.Vector2i
-import rain.State
-import rain.StateManager
 import rain.api.Input
 import rain.api.WindowContext
 import rain.api.entity.Entity
 import rain.api.gfx.ResourceFactory
 import rain.api.scene.Camera
 import rain.api.scene.Scene
+import rain.api.scene.SceneManager
 import rain.api.scene.parse.JsonSceneLoader
 import spatter.entity.EntityEditor
 import spatter.entity.EntityEditorDialog
@@ -26,7 +25,8 @@ import spatter.tilemap.TilemapEditorDialog
     6) Fit entities to current hovered tilemap (unless specified to be free-positioned)
     7) Ghost entities without a sprite attached
  */
-class EditorState(private val window: WindowContext, stateManager: StateManager): State(stateManager) {
+class EditorState(private val window: WindowContext, sceneManager: SceneManager, resourceFactory: ResourceFactory) :
+    Scene(sceneManager, resourceFactory) {
     private lateinit var toolsPanel: ToolsPanel
     private lateinit var tilemapEditor: TilemapEditor
     private lateinit var entityEditor: EntityEditor
@@ -39,11 +39,11 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
     private lateinit var loadSceneDialog: FileChooseDialog
     private lateinit var exportSceneDialog: ExportSceneDialog
 
-    private lateinit var activeCamera: Camera
     private var doCameraMove = false
     private var cameraMoveStartPoint = Vector2i(0,0)
 
-    override fun init(resourceFactory: ResourceFactory, scene: Scene) {
+    override fun init() {
+        sceneManager.activeCamera = Camera(1000.0f, Vector2i(window.size.x, window.size.y))
         setupEditorStyle()
 
         newTilemapDialog = NewTilemapDialog(window)
@@ -55,22 +55,20 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
         exportSceneDialog = ExportSceneDialog(window)
 
         entityEditor = EntityEditor(resourceFactory, entityEditorDialog)
-        tilemapEditor = TilemapEditor(resourceFactory, scene, tilemapEditorDialog)
+        tilemapEditor = TilemapEditor(resourceFactory, this, tilemapEditorDialog)
         toolsPanel = ToolsPanel(window, materialPropertiesDialog, newTilemapDialog, tilemapEditorDialog,
             newEntityDialog, entityEditorDialog, loadSceneDialog, exportSceneDialog)
-
-        activeCamera = scene.activeCamera
     }
 
-    override fun update(resourceFactory: ResourceFactory, scene: Scene, input: Input) {
+    override fun update(input: Input) {
         toolsPanel.update()
         newTilemapDialog.update()
         materialPropertiesDialog.update()
         newEntityDialog.update(currentProjectScene)
         exportSceneDialog.update()
 
-        tilemapEditor.update(input, scene.activeCamera)
-        entityEditor.update(scene, input, scene.activeCamera, tilemapEditor.hoveredTilemapGridSize(input))
+        tilemapEditor.update(input, sceneManager.activeCamera)
+        entityEditor.update(this, input, sceneManager.activeCamera, tilemapEditor.hoveredTilemapGridSize(input))
 
         if (newTilemapDialog.created) {
             tilemapEditor.createTilemap(
@@ -87,14 +85,14 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
 
         if (loadSceneDialog.hasSelected) {
             val loadedScene = JsonSceneLoader().load("./projects/project1/scenes/" + loadSceneDialog.lastSelectedItem!!.string)
-            scene.clear()
+            clear()
             val sceneMap = ArrayList<TilemapData>()
             for (data in loadedScene.map) {
                 var depth = 0.0f
                 val tileLayers = ArrayList<TilemapLayer>()
                 for (layer in data.layers) {
                     val tileGroupList = ArrayList<TileGroup>()
-                    val tilemap = scene.createTilemap(tilemapEditor.tilemapMaterial, data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight)
+                    val tilemap = createTilemap(tilemapEditor.tilemapMaterial, data.tileNumX, data.tileNumY, data.tileWidth, data.tileHeight)
                     for (group in layer.mapLayerTileGroup) {
                         val tileGroupIndices = HashSet<Int>()
                         for (index in group.tileIndicesIntoMap) {
@@ -121,7 +119,7 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
                 val instances = ArrayList<ProjectEntityInstance>()
                 for (instance in entity.value.definitionInstances) {
                     val entityInstance = Entity()
-                    scene.newEntity(entityInstance)
+                    newEntity(entityInstance)
                         .attachRenderComponent(entityEditor.spriteMaterial, entityEditor.entityMesh)
                         .build()
 
@@ -153,8 +151,8 @@ class EditorState(private val window: WindowContext, stateManager: StateManager)
                 cameraMoveStartPoint.y = input.mousePosition.y
             }
             else  {
-                activeCamera.x += (input.mousePosition.x - cameraMoveStartPoint.x)
-                activeCamera.y += (input.mousePosition.y - cameraMoveStartPoint.y)
+                sceneManager.activeCamera.x += (input.mousePosition.x - cameraMoveStartPoint.x)
+                sceneManager.activeCamera.y += (input.mousePosition.y - cameraMoveStartPoint.y)
                 cameraMoveStartPoint.x = input.mousePosition.x
                 cameraMoveStartPoint.y = input.mousePosition.y
             }

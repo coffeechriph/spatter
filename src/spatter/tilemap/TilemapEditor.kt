@@ -119,8 +119,8 @@ class TilemapEditor(private val resourceFactory: ResourceFactory, private val sc
     private fun editTilemap(x: Int, y: Int, imageX: Int, imageY: Int) {
         if (selectedTilemapData != null) {
             val activeTilemapLayer = selectedTilemapData!!.activeLayer.tilemapRef
-            val tx = ((x - activeTilemapLayer.transform.x - scene.activeCamera.x) / activeTilemapLayer.tileWidth).toInt()
-            val ty = ((y - activeTilemapLayer.transform.y - scene.activeCamera.y) / activeTilemapLayer.tileHeight).toInt()
+            val tx = ((x - activeTilemapLayer.transform.x - scene.sceneManager.activeCamera.x) / activeTilemapLayer.tileWidth).toInt()
+            val ty = ((y - activeTilemapLayer.transform.y - scene.sceneManager.activeCamera.y) / activeTilemapLayer.tileHeight).toInt()
 
             if (tx >= 0 && tx < activeTilemapLayer.tileNumX &&
                 ty >= 0 && ty < activeTilemapLayer.tileNumY) {

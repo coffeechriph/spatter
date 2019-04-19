@@ -6,9 +6,8 @@ import rain.api.Api
 class Entry: Rain() {
     private lateinit var editorState: EditorState
     override fun init() {
-        editorState = EditorState(window, stateManager)
-        stateManager.states["editor"] = editorState
-        stateManager.startState("editor")
+        editorState = EditorState(window, sceneManager, resourceFactory)
+        sceneManager.loadScene(editorState)
     }
 }
 

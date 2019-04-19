@@ -20,8 +20,8 @@ class NewEntityDialog(private val window: WindowContext): EditorDialog {
 
         panel = guiManagerCreatePanel(panelLayout)
         panel.w = 200.0f
-        panel.x = window.size.x.toFloat() - panel.w
-        panel.h = window.size.y.toFloat()
+        panel.x = window.framebufferSize.x.toFloat() - panel.w
+        panel.h = window.framebufferSize.y.toFloat()
         panel.skin = editorSkin
         panel.visible = false
         panel.moveable = false
@@ -56,8 +56,8 @@ class NewEntityDialog(private val window: WindowContext): EditorDialog {
     override fun show() {
         if (!panel.visible) {
             panel.visible = true
-            panel.x = window.size.x.toFloat() - panel.w
-            panel.h = window.size.y.toFloat()
+            panel.x = window.framebufferSize.x.toFloat() - panel.w
+            panel.h = window.framebufferSize.y.toFloat()
             panel.y = 34.0f
         }
     }

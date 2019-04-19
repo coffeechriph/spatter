@@ -40,7 +40,7 @@ class ToolsPanel(private val window: WindowContext,
         panel.skin = editorSkin
         panel.x = 0.0f
         panel.y = 0.0f
-        panel.w = window.size.x.toFloat()
+        panel.w = window.framebufferSize.x.toFloat()
         panel.h = TOOLS_PANEL_HEIGHT
         panel.moveable = false
         panel.resizable = false
@@ -55,7 +55,7 @@ class ToolsPanel(private val window: WindowContext,
     }
 
     fun update() {
-        panel.w = window.size.x.toFloat()
+        panel.w = window.framebufferSize.x.toFloat()
 
         if (createTilemapButton.clicked) {
             newTilemapDialog.show()

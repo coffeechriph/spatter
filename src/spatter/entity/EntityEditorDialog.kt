@@ -47,7 +47,7 @@ class EntityEditorDialog(private val window: WindowContext): EditorDialog {
         layout.gridW = 50.0f
         layout.gridH = 50.0f
 
-        val panelHeight = (window.size.y - TOOLS_PANEL_HEIGHT) / 4.0f
+        val panelHeight = (window.framebufferSize.y - TOOLS_PANEL_HEIGHT) / 4.0f
 
         imageSelectorPanel = guiManagerCreatePanel(layout)
         imageSelectorPanel.w = 300.0f
@@ -259,16 +259,16 @@ class EntityEditorDialog(private val window: WindowContext): EditorDialog {
     }
 
     override fun show() {
-        entityTypePanel.x = window.size.x - entityTypePanel.w
+        entityTypePanel.x = window.framebufferSize.x - entityTypePanel.w
         entityTypePanel.y = TOOLS_PANEL_HEIGHT
 
-        entityPropertiesPanel.x = window.size.x - entityPropertiesPanel.w
+        entityPropertiesPanel.x = window.framebufferSize.x - entityPropertiesPanel.w
         entityPropertiesPanel.y = entityTypePanel.y + entityTypePanel.h
 
-        imageSelectorPanel.x = window.size.x - imageSelectorPanel.w
+        imageSelectorPanel.x = window.framebufferSize.x - imageSelectorPanel.w
         imageSelectorPanel.y = entityPropertiesPanel.y + entityPropertiesPanel.h
 
-        metadataPanel.x = window.size.x - metadataPanel.w
+        metadataPanel.x = window.framebufferSize.x - metadataPanel.w
         metadataPanel.y = imageSelectorPanel.y + imageSelectorPanel.h
 
         if (selectedEntity == null && currentProjectScene.entities.isNotEmpty()) {
