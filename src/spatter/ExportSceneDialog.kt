@@ -12,8 +12,8 @@ class ExportSceneDialog(window: WindowContext): EditorDialog {
     init {
         panel.w = 200.0f
         panel.h = 100.0f
-        panel.x = window.framebufferSize.x / 2.0f - 100.0f
-        panel.y = window.framebufferSize.y - 100.0f
+        panel.x = window.size.x / 2.0f - 100.0f
+        panel.y = window.size.y - 100.0f
         panel.moveable = false
         panel.resizable = false
         panel.visible = false

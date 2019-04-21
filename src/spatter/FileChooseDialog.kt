@@ -21,10 +21,10 @@ class FileChooseDialog(private val window: WindowContext) {
     private val fileItems = ArrayList<FileItem>()
 
     init {
-        panel.w = (window.framebufferSize.x / 4).toFloat()
+        panel.w = (window.size.x / 4).toFloat()
         panel.h = 400.0f
-        panel.x = window.framebufferSize.x / 2 - panel.w / 2
-        panel.y = window.framebufferSize.y / 2 - panel.h / 2
+        panel.x = window.size.x / 2 - panel.w / 2
+        panel.y = window.size.y / 2 - panel.h / 2
         panel.visible = false
         panel.skin = editorSkin
 

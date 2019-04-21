@@ -83,8 +83,8 @@ class NewTilemapDialog(private val window: WindowContext): EditorDialog {
     }
 
     override fun show() {
-        panel.x = window.framebufferSize.x / 2.0f - panel.w / 2.0f
-        panel.y = window.framebufferSize.y / 2.0f - panel.h / 2.0f
+        panel.x = window.size.x / 2.0f - panel.w / 2.0f
+        panel.y = window.size.y / 2.0f - panel.h / 2.0f
         panel.visible = true
     }
 

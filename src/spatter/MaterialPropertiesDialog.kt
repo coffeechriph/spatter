@@ -21,8 +21,8 @@ class MaterialPropertiesDialog(window: WindowContext): EditorDialog {
         panel = guiManagerCreatePanel(layout)
         panel.w = 300.0f
         panel.h = 500.0f
-        panel.x = window.framebufferSize.x / 2 - panel.w / 2
-        panel.y = window.framebufferSize.y / 2 - panel.h / 2
+        panel.x = window.size.x / 2 - panel.w / 2
+        panel.y = window.size.y / 2 - panel.h / 2
         panel.visible = false
         panel.skin = editorSkin
 
